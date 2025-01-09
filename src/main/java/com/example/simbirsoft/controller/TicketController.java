@@ -46,8 +46,8 @@ public class TicketController {
 
     @GetMapping(value = "/allTickets/{airlineId}")
     public ResponseEntity<List<TicketDto>> getTicketsByAirlineId(@PathVariable("airlineId") Long airlineId){
-        List<TicketDto> ticketDto = ticketService.getTicketsByAirlineId(airlineId);
-        return ResponseEntity.ok(ticketDto);
+        List<TicketDto> ticketDtos = ticketService.getTicketsByAirlineId(airlineId);
+        return ResponseEntity.ok(ticketDtos);
     }
 
     @DeleteMapping(value = "/{id}")
