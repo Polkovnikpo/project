@@ -1,0 +1,49 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet id="1" author="Pimenova Polina">
+        <createTable tableName="airplane">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="model" type="VARCHAR"/>
+            <column name="places" type="VARCHAR"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="Pimenova Polina" id="2">
+        <createTable tableName="flight">
+            <column name="id" type="BIGINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="starting_point" type="VARCHAR(255)"/>
+            <column name="destination_point" type="VARCHAR(255)"/>
+            <column name="departure_time" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="arrival_time" type="TIMESTAMP WITHOUT TIME ZONE"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="3" author="Pimenova Polina">
+        <createTable tableName="ticket">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" />
+            </column>
+            <column name="flight_id" type="BIGINT">
+                <constraints primaryKey="false" />
+            </column>
+            <column name="price" type="INTEGER" />
+            <column name="status" type="VARCHAR(50)" />
+        </createTable>
+        <addForeignKeyConstraint baseTableName="ticket"
+                                 baseColumnNames="flight_id"
+                                 constraintName="fk_ticket_flight"
+                                 referencedTableName="flight"
+                                 referencedColumnNames="id" />
+    </changeSet>
+</databaseChangeLog>
+
+
+
