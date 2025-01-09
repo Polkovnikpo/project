@@ -46,8 +46,8 @@ public class TicketController {
 
     @GetMapping(value = "/allTickets/{airlineId}")
     public ResponseEntity<List<TicketDto>> getTicketsByAirlineId(@PathVariable("airlineId") Long airlineId){
-        List<TicketDto> ticketDtos = ticketService.getTicketsByAirlineId(airlineId);
-        return ResponseEntity.ok(ticketDtos);
+        List<TicketDto> ticketDto = ticketService.getTicketsByAirlineId(airlineId);
+        return ResponseEntity.ok(ticketDto);
     }
 
     @DeleteMapping(value = "/{id}")
@@ -55,9 +55,5 @@ public class TicketController {
         ticketService.deleteTicketById(id);
     }
 
-    @GetMapping(value = "/sex")
-    public ResponseEntity<String> getTicketsByAirlineId(){
-        return ResponseEntity.ok("ticketDtos");
-    }
 }
 
