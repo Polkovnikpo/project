@@ -1,4 +1,4 @@
-package entity;
+package com.example.simbirsoft.entity;
 
 
 import jakarta.persistence.*;
@@ -29,55 +29,54 @@ public class Airplane {
 
     @ManyToOne
     @JoinColumn(name = "airline_id", nullable = false)
-    private Airplane airplane;
-
+    private Airline airline;
 
     public Long getId() {
         return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getModel() {
-        return model;
-    }
-
-    public Integer getPlaces() {
-        return places;
-    }
-
-    public List<Flight> getFlights() {
-        return flights;
-    }
-
-    public Airplane getAirplane() {
-        return airplane;
     }
 
     public void setId(Long id) {
         this.id = id;
     }
 
+    public String getName() {
+        return name;
+    }
+
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getModel() {
+        return model;
     }
 
     public void setModel(String model) {
         this.model = model;
     }
 
+    public Integer getPlaces() {
+        return places;
+    }
+
     public void setPlaces(Integer places) {
         this.places = places;
+    }
+
+    public List<Flight> getFlights() {
+        return flights;
     }
 
     public void setFlights(List<Flight> flights) {
         this.flights = flights;
     }
 
-    public void setAirplane(Airplane airplane) {
-        this.airplane = airplane;
+    public Airline getAirline() {
+        return airline;
+    }
+
+    public void setAirline(Airline airline) {
+        this.airline = airline;
     }
 }
 

@@ -1,7 +1,5 @@
-package entity;
+package com.example.simbirsoft.entity;
 
-import entity.Flight;
-import entity.TicketStatus;
 import jakarta.persistence.*;
 import lombok.Data;
 

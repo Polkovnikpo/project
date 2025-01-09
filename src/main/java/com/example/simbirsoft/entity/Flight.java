@@ -1,4 +1,4 @@
-package entity;
+package com.example.simbirsoft.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;

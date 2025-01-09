@@ -1,27 +1,36 @@
-package service;
+package com.example.simbirsoft.service;
 
-import dto.FlightDto;
-import dto.TicketDto;
-import entity.Flight;
-import entity.Ticket;
-import entity.TicketStatus;
-import jakarta.persistence.criteria.CriteriaBuilder;
+import com.example.simbirsoft.dto.TicketDto;
+import com.example.simbirsoft.entity.Airplane;
+import com.example.simbirsoft.entity.Flight;
+import com.example.simbirsoft.entity.Ticket;
+import com.example.simbirsoft.repository.AirplaneRepository;
+import com.example.simbirsoft.repository.FlightRepository;
+import com.example.simbirsoft.repository.TicketRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import repository.TicketRepository;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
 public class TicketService {
 
-    private TicketRepository ticketRepository;
+    private final TicketRepository ticketRepository;
 
+    private final FlightRepository flightRepository;
+
+    private final AirplaneRepository airplaneRepository;
     @Autowired
-    public TicketService(TicketRepository ticketRepository) {
+    public TicketService(TicketRepository ticketRepository,
+                         FlightRepository flightRepository,
+                         AirplaneRepository airplaneRepository) {
         this.ticketRepository = ticketRepository;
+        this.flightRepository = flightRepository;
+        this.airplaneRepository = airplaneRepository;
     }
 
     public TicketDto createTicket(TicketDto ticketDto) {
@@ -34,13 +43,13 @@ public class TicketService {
 
     public TicketDto createTicketWithCommission(TicketDto dto, BigDecimal commissionRite) {
         Ticket ticket = mapDtoToTicket(dto);
-        int commissionPrice = calculateCommission(ticket.getPrice(),commissionRite);
+        int commissionPrice = calculateCommission(ticket.getPrice(), commissionRite);
         ticket.setPrice(BigDecimal.valueOf(commissionPrice));
         ticketRepository.save(ticket);
         return mapTicketToDto(ticket);
     }
 
-    private int calculateCommission(BigDecimal basePrice,BigDecimal commissionRite){
+    private int calculateCommission(BigDecimal basePrice, BigDecimal commissionRite) {
         BigDecimal commission = basePrice.multiply(commissionRite.divide(BigDecimal.valueOf(100)));
         return basePrice.add(commission).setScale(0, RoundingMode.HALF_UP).intValue();
     }
@@ -71,6 +80,28 @@ public class TicketService {
 
     public void deleteTicketById(Long id) {
         ticketRepository.deleteById(id);
+    }
+
+
+    public List<TicketDto> getTicketsByAirlineId(Long airlineId) {
+        List<Ticket> allTickets = new ArrayList<>();
+
+        List<Airplane> airplanes = airplaneRepository.getAirplanesByAirlineId(airlineId);
+        for (Airplane airplane : airplanes) {
+            Long airplaneId = airplane.getId();
+            List<Flight> flights = flightRepository.getFlightsByAirplaneId(airplaneId);
+            for (Flight flight : flights) {
+                Long flightId = flight.getId();
+                List<Ticket> tickets = ticketRepository.getTicketsByFlightId(flightId);
+                allTickets.addAll(tickets);
+            }
+        }
+        List<TicketDto> ticketDtos = new ArrayList<>();
+        for (Ticket ticket : allTickets) {
+            TicketDto ticketDto = mapTicketToDto(ticket);
+            ticketDtos.add(ticketDto);
+        }
+        return ticketDtos;
     }
 
     public Ticket mapDtoToTicket(TicketDto ticketDto) {

@@ -1,10 +1,9 @@
-package service;
+package com.example.simbirsoft.service;
 
-import dto.FlightDto;
-import entity.Airplane;
-import entity.Flight;
+import com.example.simbirsoft.dto.FlightDto;
+import com.example.simbirsoft.entity.Flight;
 import org.springframework.stereotype.Service;
-import repository.FlightRepository;
+import com.example.simbirsoft.repository.FlightRepository;
 
 import java.util.Optional;
 

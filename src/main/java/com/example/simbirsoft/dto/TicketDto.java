@@ -1,6 +1,6 @@
-package dto;
+package com.example.simbirsoft.dto;
 
-import entity.TicketStatus;
+import com.example.simbirsoft.entity.TicketStatus;
 import lombok.Data;
 
 import java.math.BigDecimal;

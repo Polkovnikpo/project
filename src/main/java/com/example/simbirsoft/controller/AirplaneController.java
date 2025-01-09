@@ -1,11 +1,10 @@
-package controller;
+package com.example.simbirsoft.controller;
 
-import dto.AirplaneDto;
-import entity.Airplane;
+import com.example.simbirsoft.dto.AirplaneDto;
+import com.example.simbirsoft.service.AirplaneService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import service.AirplaneService;
 
 @RestController
 @RequestMapping("/airplane")

@@ -1,4 +1,4 @@
-package dto;
+package com.example.simbirsoft.dto;
 
 import lombok.Data;
 

@@ -1,13 +1,13 @@
-package controller;
+package com.example.simbirsoft.controller;
 
-import dto.TicketDto;
-import entity.Ticket;
+import com.example.simbirsoft.dto.TicketDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import service.TicketService;
+import com.example.simbirsoft.service.TicketService;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @RestController
 @RequestMapping("/ticket")
@@ -44,9 +44,20 @@ public class TicketController {
         return ResponseEntity.ok(ticketDto);
     }
 
+    @GetMapping(value = "/allTickets/{airlineId}")
+    public ResponseEntity<List<TicketDto>> getTicketsByAirlineId(@PathVariable("airlineId") Long airlineId){
+        List<TicketDto> ticketDtos = ticketService.getTicketsByAirlineId(airlineId);
+        return ResponseEntity.ok(ticketDtos);
+    }
+
     @DeleteMapping(value = "/{id}")
     public void deleteTicket(@PathVariable("id") Long id) {
         ticketService.deleteTicketById(id);
+    }
+
+    @GetMapping(value = "/sex")
+    public ResponseEntity<String> getTicketsByAirlineId(){
+        return ResponseEntity.ok("ticketDtos");
     }
 }
 
