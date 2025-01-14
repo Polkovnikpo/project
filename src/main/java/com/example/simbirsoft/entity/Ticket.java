@@ -25,6 +25,9 @@ public class Ticket {
     @Column
     private TicketStatus status;
 
+    @Column(name = "sold_with_commission", nullable = false)
+    private boolean isSoldWithCommission;
+
     public Long getId() {
         return id;
     }
@@ -41,6 +44,10 @@ public class Ticket {
         return status;
     }
 
+    public boolean isSoldWithCommission() {
+        return isSoldWithCommission;
+    }
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -55,5 +62,9 @@ public class Ticket {
 
     public void setStatus(TicketStatus status) {
         this.status = status;
+    }
+
+    public void setSoldWithCommission(boolean isSoldWithCommission) {
+        this.isSoldWithCommission = isSoldWithCommission;
     }
 }

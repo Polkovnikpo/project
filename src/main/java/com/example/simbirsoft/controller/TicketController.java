@@ -44,10 +44,10 @@ public class TicketController {
         return ResponseEntity.ok(ticketDto);
     }
 
-    @GetMapping(value = "/allTickets/{airlineId}")
-    public ResponseEntity<List<TicketDto>> getTicketsByAirlineId(@PathVariable("airlineId") Long airlineId){
-        List<TicketDto> ticketDtos = ticketService.getTicketsByAirlineId(airlineId);
-        return ResponseEntity.ok(ticketDtos);
+    @GetMapping("/ticketCountByStartingPoint")
+    public ResponseEntity<Integer> getTicketCountByStartingPoint(@RequestParam("startingPoint") String startingPoint){
+        int ticketCount = ticketService.getTicketCountByStartingPoint(startingPoint);
+        return ResponseEntity.ok(ticketCount);
     }
 
     @DeleteMapping(value = "/{id}")

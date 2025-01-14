@@ -10,6 +10,7 @@ public class TicketDto {
     private BigDecimal price;
     private TicketStatus status;
 
+
     public BigDecimal getPrice() {
         return price;
     }
@@ -18,11 +19,21 @@ public class TicketDto {
         return status;
     }
 
+    public boolean soldWithCommission;
+
+    public boolean isSoldWithCommission() {
+        return soldWithCommission;
+    }
+
     public void setPrice(BigDecimal price) {
         this.price = price;
     }
 
     public void setStatus(TicketStatus status) {
         this.status = status;
+    }
+
+    public void setSoldWithCommission(boolean soldWithCommission) {
+        this.soldWithCommission = soldWithCommission;
     }
 }

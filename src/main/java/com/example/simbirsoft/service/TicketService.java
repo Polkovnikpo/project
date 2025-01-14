@@ -82,32 +82,19 @@ public class TicketService {
         ticketRepository.deleteById(id);
     }
 
+    public Integer getTicketCountByStartingPoint(String startingPoint) {
+        List<Flight> flights = flightRepository.findByStartingPoint(startingPoint);
 
-    public List<TicketDto> getTicketsByAirlineId(Long airlineId) {
-        List<Ticket> allTickets = new ArrayList<>();
-
-        List<Airplane> airplanes = airplaneRepository.getAirplanesByAirlineId(airlineId);
-        for (Airplane airplane : airplanes) {
-            Long airplaneId = airplane.getId();
-            List<Flight> flights = flightRepository.getFlightsByAirplaneId(airplaneId);
-            for (Flight flight : flights) {
-                Long flightId = flight.getId();
-                List<Ticket> tickets = ticketRepository.getTicketsByFlightId(flightId);
-                allTickets.addAll(tickets);
-            }
-        }
-        List<TicketDto> ticketDtos = new ArrayList<>();
-        for (Ticket ticket : allTickets) {
-            TicketDto ticketDto = mapTicketToDto(ticket);
-            ticketDtos.add(ticketDto);
-        }
-        return ticketDtos;
+        return flights.stream()
+                .flatMap(flight -> flight.getTickets().stream())
+                .toList().size();
     }
 
     public Ticket mapDtoToTicket(TicketDto ticketDto) {
         Ticket ticket = new Ticket();
         ticket.setPrice(ticketDto.getPrice());
         ticket.setStatus(ticketDto.getStatus());
+        ticket.setSoldWithCommission(ticketDto.isSoldWithCommission());
         return ticket;
     }
 
@@ -115,6 +102,7 @@ public class TicketService {
         TicketDto ticketDto = new TicketDto();
         ticketDto.setPrice(ticket.getPrice());
         ticketDto.setStatus(ticket.getStatus());
+        ticketDto.setSoldWithCommission(ticket.isSoldWithCommission());
         return ticketDto;
     }
 }
