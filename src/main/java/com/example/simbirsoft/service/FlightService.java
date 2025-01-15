@@ -1,7 +1,9 @@
 package com.example.simbirsoft.service;
 
 import com.example.simbirsoft.dto.FlightDto;
+import com.example.simbirsoft.entity.Airplane;
 import com.example.simbirsoft.entity.Flight;
+import com.example.simbirsoft.repository.AirplaneRepository;
 import org.springframework.stereotype.Service;
 import com.example.simbirsoft.repository.FlightRepository;
 
@@ -11,13 +13,17 @@ import java.util.Optional;
 public class FlightService {
 
     private final FlightRepository flightRepository;
+    private final AirplaneRepository airplaneRepository;
 
-    public FlightService(FlightRepository flightRepository) {
+    public FlightService(FlightRepository flightRepository, AirplaneRepository airplaneRepository) {
         this.flightRepository = flightRepository;
+        this.airplaneRepository = airplaneRepository;
     }
 
     public FlightDto createFlight(FlightDto dto) {
         Flight flight = mapDtoToFlight(dto);
+        Airplane airplane = airplaneRepository.findById(dto.getAirplaneId()).orElseThrow();
+        flight.setAirplane(airplane);
         flightRepository.save(flight);
         FlightDto flightDto = mapFlightToDto(flight);
         return flightDto;

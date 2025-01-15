@@ -20,40 +20,45 @@ public class TicketController {
         this.ticketService = ticketService;
     }
 
-    @PostMapping
+    @PostMapping(value = "/create")
     public ResponseEntity<TicketDto> createTicket(@RequestBody TicketDto dto) {
-        TicketDto ticketDto = ticketService.createTicket(dto);
-        return ResponseEntity.ok(ticketDto);
+        TicketDto createTicket = ticketService.createTicket(dto);
+        return ResponseEntity.ok(createTicket);
     }
 
-    @PostMapping("/commission")
+    @PostMapping(value = "/commission")
     ResponseEntity<TicketDto> createTicketWithCommission(@RequestBody TicketDto dto, @RequestParam BigDecimal commission) {
-        TicketDto ticketDto = ticketService.createTicketWithCommission(dto, commission);
-        return ResponseEntity.ok(ticketDto);
+        TicketDto ticketWithCommission = ticketService.createTicketWithCommission(dto, commission);
+        return ResponseEntity.ok(ticketWithCommission);
     }
 
     @PutMapping(value = "/{id}")
     public ResponseEntity<TicketDto> updateTicket(@PathVariable("id") Long id, @RequestBody TicketDto dto) {
-        TicketDto ticketDto = ticketService.updateTicketById(id, dto);
-        return ResponseEntity.ok(ticketDto);
+        TicketDto updateTicket = ticketService.updateTicketById(id, dto);
+        return ResponseEntity.ok(updateTicket);
     }
 
     @GetMapping(value = "/{id}")
     public ResponseEntity<TicketDto> getTicket(@PathVariable("id") Long id) {
-        TicketDto ticketDto = ticketService.getTicketById(id);
-        return ResponseEntity.ok(ticketDto);
+        TicketDto getTicket = ticketService.getTicketById(id);
+        return ResponseEntity.ok(getTicket);
     }
 
-    @GetMapping("/ticketCountByStartingPoint")
+    @GetMapping(value = "/ticketCountByStartingPoint")
     public ResponseEntity<Integer> getTicketCountByStartingPoint(@RequestParam("startingPoint") String startingPoint){
         int ticketCount = ticketService.getTicketCountByStartingPoint(startingPoint);
         return ResponseEntity.ok(ticketCount);
+    }
+
+    @GetMapping(value = "/averageCommissionInRubles")
+    public ResponseEntity<BigDecimal> getAverageCommissionInRubles(){
+        BigDecimal commission = ticketService.getAverageCommissionInRubles();
+        return ResponseEntity.ok(commission);
     }
 
     @DeleteMapping(value = "/{id}")
     public void deleteTicket(@PathVariable("id") Long id) {
         ticketService.deleteTicketById(id);
     }
-
 }
 

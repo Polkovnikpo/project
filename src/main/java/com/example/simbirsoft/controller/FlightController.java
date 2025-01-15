@@ -19,20 +19,20 @@ public class FlightController {
 
     @PostMapping
     public ResponseEntity<FlightDto> createFlight(@RequestBody FlightDto dto) {
-        FlightDto flightDto = flightService.createFlight(dto);
-        return ResponseEntity.ok(flightDto);
+        FlightDto createFlight = flightService.createFlight(dto);
+        return ResponseEntity.ok(createFlight);
     }
 
     @PutMapping(value = "/{id}")
     public ResponseEntity<FlightDto> updateFlight(@PathVariable("id") Long id, @RequestBody FlightDto dto) {
-        FlightDto flightDto = flightService.updateFlight(id, dto);
-        return ResponseEntity.ok(flightDto);
+        FlightDto updateFlight = flightService.updateFlight(id, dto);
+        return ResponseEntity.ok(updateFlight);
     }
 
     @GetMapping(value = "/{id}")
     public ResponseEntity<FlightDto> getFlightById(@PathVariable("id") Long id) {
-        FlightDto flightDto = flightService.getFlightById(id);
-        return ResponseEntity.ok(flightDto);
+        FlightDto getFlight = flightService.getFlightById(id);
+        return ResponseEntity.ok(getFlight);
     }
 
     @DeleteMapping(value = "/{id}")

@@ -1,7 +1,6 @@
 package com.example.simbirsoft.service;
 
 import com.example.simbirsoft.dto.TicketDto;
-import com.example.simbirsoft.entity.Airplane;
 import com.example.simbirsoft.entity.Flight;
 import com.example.simbirsoft.entity.Ticket;
 import com.example.simbirsoft.repository.AirplaneRepository;
@@ -12,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,6 +33,8 @@ public class TicketService {
 
     public TicketDto createTicket(TicketDto ticketDto) {
         Ticket ticket = mapDtoToTicket(ticketDto);
+        Flight flight = flightRepository.findById(ticketDto.getFlightId()).orElseThrow();
+        ticket.setFlight(flight);
         ticketRepository.save(ticket);
         TicketDto dto = mapTicketToDto(ticket);
 
@@ -45,6 +45,7 @@ public class TicketService {
         Ticket ticket = mapDtoToTicket(dto);
         int commissionPrice = calculateCommission(ticket.getPrice(), commissionRite);
         ticket.setPrice(BigDecimal.valueOf(commissionPrice));
+        ticket.setIsCommission(true);
         ticketRepository.save(ticket);
         return mapTicketToDto(ticket);
     }
@@ -90,11 +91,31 @@ public class TicketService {
                 .toList().size();
     }
 
+    public BigDecimal getAverageCommissionInRubles(){
+        List<Ticket> ticketsCommission = ticketRepository.findAllByIsCommission(true);
+
+        if(ticketsCommission.isEmpty()){
+            return BigDecimal.ZERO;
+        }
+
+        BigDecimal sum = BigDecimal.ZERO;
+        for (Ticket ticket: ticketsCommission) {
+            BigDecimal ticketPrice = ticket.getPrice();
+
+            if(ticketPrice != null){
+                BigDecimal result = ticketPrice.multiply(BigDecimal.valueOf(0.025));
+                sum = sum.add(result);
+            }
+        }
+
+        return sum.divide(BigDecimal.valueOf(ticketsCommission.size()), 2, RoundingMode.HALF_UP);
+    }
+
     public Ticket mapDtoToTicket(TicketDto ticketDto) {
         Ticket ticket = new Ticket();
         ticket.setPrice(ticketDto.getPrice());
         ticket.setStatus(ticketDto.getStatus());
-        ticket.setSoldWithCommission(ticketDto.isSoldWithCommission());
+        ticket.setIsCommission(ticketDto.isCommission());
         return ticket;
     }
 
@@ -102,7 +123,7 @@ public class TicketService {
         TicketDto ticketDto = new TicketDto();
         ticketDto.setPrice(ticket.getPrice());
         ticketDto.setStatus(ticket.getStatus());
-        ticketDto.setSoldWithCommission(ticket.isSoldWithCommission());
+        ticketDto.setCommission(ticket.isIsCommission());
         return ticketDto;
     }
 }

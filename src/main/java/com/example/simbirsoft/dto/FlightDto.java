@@ -10,6 +10,7 @@ public class FlightDto {
     private String destinationPoint;
     private LocalDateTime departureTime;
     private LocalDateTime arrivalTime;
+    private long airplaneId;
 
     public String getStartingPoint() {
         return startingPoint;
@@ -27,6 +28,10 @@ public class FlightDto {
         return arrivalTime;
     }
 
+    public long getAirplaneId() {
+        return airplaneId;
+    }
+
     public void setStartingPoint(String startingPoint) {
         this.startingPoint = startingPoint;
     }
@@ -41,5 +46,9 @@ public class FlightDto {
 
     public void setArrivalTime(LocalDateTime arrivalTime) {
         this.arrivalTime = arrivalTime;
+    }
+
+    public void setAirplaneId(long airplaneId) {
+        this.airplaneId = airplaneId;
     }
 }

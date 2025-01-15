@@ -76,6 +76,9 @@
             <column name="status" type="VARCHAR(50)">
                 <constraints nullable="false" />
             </column>
+            <column name="is_commission" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
 
         <addForeignKeyConstraint baseTableName="ticket"

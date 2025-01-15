@@ -4,15 +4,11 @@ import lombok.Data;
 
 @Data
 public class AirplaneDto {
-    private Long id;
     private String name;
     private String model;
     private Integer places;
-    private AirlineDto airlineDto;
+    private long airlineId;
 
-    public Long getId() {
-        return id;
-    }
 
     public String getName() {
         return name;
@@ -26,8 +22,8 @@ public class AirplaneDto {
         return places;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public long getAirlineId() {
+        return airlineId;
     }
 
     public void setName(String name) {
@@ -42,11 +38,7 @@ public class AirplaneDto {
         this.places = places;
     }
 
-    public void setAirlineDto(AirlineDto airlineDto) {
-        this.airlineDto = airlineDto;
-    }
-
-    public AirlineDto getAirlineDto() {
-        return airlineDto;
+    public void setAirlineId(long airlineId) {
+        this.airlineId = airlineId;
     }
 }

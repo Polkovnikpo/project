@@ -9,7 +9,8 @@ import java.math.BigDecimal;
 public class TicketDto {
     private BigDecimal price;
     private TicketStatus status;
-
+    private boolean isCommission;
+    private long flightId;
 
     public BigDecimal getPrice() {
         return price;
@@ -19,10 +20,12 @@ public class TicketDto {
         return status;
     }
 
-    public boolean soldWithCommission;
+    public boolean isCommission() {
+        return isCommission;
+    }
 
-    public boolean isSoldWithCommission() {
-        return soldWithCommission;
+    public long getFlightId() {
+        return flightId;
     }
 
     public void setPrice(BigDecimal price) {
@@ -33,7 +36,11 @@ public class TicketDto {
         this.status = status;
     }
 
-    public void setSoldWithCommission(boolean soldWithCommission) {
-        this.soldWithCommission = soldWithCommission;
+    public void setCommission(boolean commission) {
+        isCommission = commission;
+    }
+
+    public void setFlightId(long flightId) {
+        this.flightId = flightId;
     }
 }

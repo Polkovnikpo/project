@@ -1,5 +1,7 @@
 package com.example.simbirsoft.service;
 
+import com.example.simbirsoft.entity.Airline;
+import com.example.simbirsoft.repository.AirlineRepository;
 import com.example.simbirsoft.repository.AirplaneRepository;
 import com.example.simbirsoft.dto.AirplaneDto;
 import com.example.simbirsoft.entity.Airplane;
@@ -11,14 +13,18 @@ import java.util.Optional;
 public class AirplaneService {
 
     private final AirplaneRepository airplaneRepository;
+    private final AirlineRepository airlineRepository;
 
-    public AirplaneService(AirplaneRepository airplaneRepository) {
+    public AirplaneService(AirplaneRepository airplaneRepository, AirlineRepository airlineRepository) {
         this.airplaneRepository = airplaneRepository;
+        this.airlineRepository = airlineRepository;
     }
 
     public AirplaneDto createAirplane(AirplaneDto dto) {
         //с помощью метода превратили dto в сущность
         Airplane airplane = mapDtoToAirplane(dto);
+        Airline airline = airlineRepository.findById(dto.getAirlineId()).orElseThrow();
+        airplane.setAirline(airline);
         // сохранили
         airplaneRepository.save(airplane);
         //обратно из сущности первращаем в dto
@@ -74,6 +80,7 @@ public class AirplaneService {
         airplane.setPlaces(dto.getPlaces());
         return airplane;
     }
+
     //метод превращения энтити самолет в dto
     public AirplaneDto mapAirplaneToDto(Airplane airplane) {
         AirplaneDto airplaneDto = new AirplaneDto();
