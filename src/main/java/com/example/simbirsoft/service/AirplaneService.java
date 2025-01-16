@@ -5,10 +5,12 @@ import com.example.simbirsoft.repository.AirlineRepository;
 import com.example.simbirsoft.repository.AirplaneRepository;
 import com.example.simbirsoft.dto.AirplaneDto;
 import com.example.simbirsoft.entity.Airplane;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+@Slf4j
 @Service
 public class AirplaneService {
 
@@ -21,59 +23,60 @@ public class AirplaneService {
     }
 
     public AirplaneDto createAirplane(AirplaneDto dto) {
-        //с помощью метода превратили dto в сущность
+        log.info("Создание нового самолета с данными: {}", dto);
         Airplane airplane = mapDtoToAirplane(dto);
         Airline airline = airlineRepository.findById(dto.getAirlineId()).orElseThrow();
         airplane.setAirline(airline);
-        // сохранили
         airplaneRepository.save(airplane);
-        //обратно из сущности первращаем в dto
-        // тут на самом деле можно было бы вернуть ту же dto
-        // например return dto(которая в парметрах) вместо 28 и 29 строчки -
-        // то есть не создавая новую - так как хотим вернуть тоже самое
         AirplaneDto airplaneDto = mapAirplaneToDto(airplane);
+        log.info("Самолет успешно создан");
         return airplaneDto;
     }
 
 
     public AirplaneDto updateAirplane(Long id, AirplaneDto dto) {
+        log.info("Обновление самолета с ID: {}, новые данные: {}", id, dto);
         Optional<Airplane> airplaneOptional = airplaneRepository.findById(id);
-        // достаем опшионал из б
-        //проверяем есть ли такой самолет
         if (airplaneOptional.isPresent()) {
-            //достаем самолет сам
             Airplane airplane = airplaneOptional.get();
-            //устанавливаем поля нужные
             airplane.setName(dto.getName());
             airplane.setModel(dto.getModel());
             airplane.setPlaces(dto.getPlaces());
-
-            //сохраняем
             airplaneRepository.save(airplane);
-
-            //превращаем в dto чтобы вернуть результат
-            //тут тоже можно было бы просто вернуть тот же dto из параметров
             AirplaneDto airplaneDto = mapAirplaneToDto(airplane);
+            log.info("Самолет с ID {} успешно обновлен", id);
             return airplaneDto;
+        } else {
+            log.warn("Самолет с ID {} не найден для обновления", id);
+            return null;
         }
-        return null;
     }
 
     public AirplaneDto getAirplaneById(Long id) {
+        log.info("Получение самолета с ID: {}", id);
         Optional<Airplane> airplane = airplaneRepository.findById(id);
         if (airplane.isPresent()) {
             AirplaneDto airplaneDto = mapAirplaneToDto(airplane.get());
+            log.info("Самолет с ID {} успешно получен: {}", id, airplaneDto);
             return airplaneDto;
+        } else {
+            log.warn("Самолет с ID {} не найден", id);
+            return null;
         }
-        return null;
     }
 
     public void deleteAirplaneById(Long id) {
-        airplaneRepository.deleteById(id);
+        log.info("Удаление самолета с ID: {}", id);
+        try {
+            airplaneRepository.deleteById(id);
+            log.info("Самолет с ID {} успешно удален", id);
+        } catch (Exception e) {
+            log.error("Ошибка при удаление самолета с ID {}: {}", id, e.getMessage(), e);
+        }
     }
 
-    //метод превращения dto в энтити самолет
     public Airplane mapDtoToAirplane(AirplaneDto dto) {
+        log.debug("Маппинг объекта AirplaneDto в Airplane: {}", dto);
         Airplane airplane = new Airplane();
         airplane.setName(dto.getName());
         airplane.setModel(dto.getModel());
@@ -81,8 +84,8 @@ public class AirplaneService {
         return airplane;
     }
 
-    //метод превращения энтити самолет в dto
     public AirplaneDto mapAirplaneToDto(Airplane airplane) {
+        log.debug("Маппинг объекта Airplane в AirplaneDto: {}", airplane);
         AirplaneDto airplaneDto = new AirplaneDto();
         airplaneDto.setName(airplane.getName());
         airplaneDto.setModel(airplane.getModel());
