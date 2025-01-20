@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import com.example.simbirsoft.repository.FlightRepository;
 
-import java.awt.event.WindowFocusListener;
 import java.util.Optional;
 
 @Slf4j

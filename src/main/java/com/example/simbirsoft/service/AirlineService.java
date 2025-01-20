@@ -2,18 +2,11 @@ package com.example.simbirsoft.service;
 
 
 import com.example.simbirsoft.dto.AirlineDto;
-import com.example.simbirsoft.dto.FlightDto;
-import com.example.simbirsoft.dto.TicketDto;
 import com.example.simbirsoft.entity.Airline;
-import com.example.simbirsoft.entity.Airplane;
-import com.example.simbirsoft.entity.Flight;
-import com.example.simbirsoft.entity.Ticket;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import com.example.simbirsoft.repository.AirlineRepository;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 @Slf4j

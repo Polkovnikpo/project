@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 @Entity
 @Data
@@ -53,7 +54,7 @@ public class Ticket {
     }
 
     public void setFlight(Flight flight) {
-        this.flight = flight;
+        flight = flight;
     }
 
     public void setPrice(BigDecimal price) {

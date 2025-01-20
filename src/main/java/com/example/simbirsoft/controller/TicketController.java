@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import com.example.simbirsoft.service.TicketService;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 @RestController
 @RequestMapping("/ticket")
