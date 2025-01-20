@@ -10,10 +10,10 @@ import com.example.simbirsoft.repository.TicketRepository;
 import com.example.simbirsoft.service.TicketService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.util.Optional;
@@ -25,7 +25,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class TicketServiceTest {
     @Mock
     private TicketRepository ticketRepository;
@@ -44,9 +44,7 @@ class TicketServiceTest {
     private Ticket ticket;
 
     @BeforeEach
-    public void setUp(){
-        MockitoAnnotations.openMocks(this);
-
+    public void setUp() {
         ticketDto = new TicketDto();
         ticketDto.setPrice(BigDecimal.valueOf(1000));
         ticketDto.setStatus(TicketStatus.BOOKED);
@@ -63,36 +61,36 @@ class TicketServiceTest {
     }
 
     @Test
-    void testCreateTicket(){
+    void testCreateTicket() {
         when(flightRepository.findById(anyLong())).thenReturn(Optional.of(flight));
         when(ticketRepository.save(any(Ticket.class))).thenReturn(ticket);
 
         TicketDto result = ticketService.createTicket(ticketDto);
 
         assertNotNull(result);
-        assertEquals(BigDecimal.valueOf(1000),result.getPrice());
-        assertEquals(TicketStatus.BOOKED,result.getStatus());
+        assertEquals(BigDecimal.valueOf(1000), result.getPrice());
+        assertEquals(TicketStatus.BOOKED, result.getStatus());
 
         verify(flightRepository, times(1)).findById(anyLong());
         verify(ticketRepository, times(1)).save(any(Ticket.class));
     }
 
     @Test
-    void testCreateTicketWithCommission(){
-            BigDecimal commissionRate = BigDecimal.valueOf(10);
-            when(ticketRepository.save(any(Ticket.class))).thenReturn(ticket);
+    void testCreateTicketWithCommission() {
+        BigDecimal commissionRate = BigDecimal.valueOf(10);
+        when(ticketRepository.save(any(Ticket.class))).thenReturn(ticket);
 
-            TicketDto result = ticketService.createTicketWithCommission(ticketDto, commissionRate);
+        TicketDto result = ticketService.createTicketWithCommission(ticketDto, commissionRate);
 
-            assertNotNull(result);
-            assertEquals(BigDecimal.valueOf(1000),result.getPrice());
-            assertEquals(true, result.isCommission());
+        assertNotNull(result);
+        assertEquals(BigDecimal.valueOf(1100), result.getPrice());
+        assertEquals(true, result.isCommission());
 
-            verify(ticketRepository, times(1)).save(any(Ticket.class));
+        verify(ticketRepository, times(1)).save(any(Ticket.class));
     }
 
     @Test
-    void testUpdateTicketById(){
+    void testUpdateTicketById() {
         when(ticketRepository.findById(anyLong())).thenReturn(Optional.of(ticket));
         when(ticketRepository.save(any(Ticket.class))).thenReturn(ticket);
 

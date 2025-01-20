@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Slf4j
@@ -34,14 +35,16 @@ public class TicketService {
         this.airplaneRepository = airplaneRepository;
     }
 
-    public TicketDto createTicket(TicketDto ticketDto) {
-        Ticket ticket = mapDtoToTicket(ticketDto);
-        Flight flight = flightRepository.findById(ticketDto.getFlightId()).orElseThrow();
+
+    public TicketDto createTicket(TicketDto dto) {
+        Ticket ticket = mapDtoToTicket(dto);
+        Flight flight = flightRepository.findById(dto.getFlightId())
+                .orElseThrow(() -> new NoSuchElementException("Рейс не найден с ID = " + dto.getFlightId()));
         ticket.setFlight(flight);
         ticketRepository.save(ticket);
-        TicketDto dto = mapTicketToDto(ticket);
+        TicketDto ticketDto = mapTicketToDto(ticket);
         log.info("Билет успешно создан");
-        return dto;
+        return ticketDto;
     }
 
     public TicketDto createTicketWithCommission(TicketDto dto, BigDecimal commissionRate) {
