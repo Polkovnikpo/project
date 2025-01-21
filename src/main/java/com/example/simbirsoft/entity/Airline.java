@@ -14,7 +14,7 @@ public class Airline {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column
+    @Column(name = "name")
     private String name;
 
     @OneToMany(mappedBy = "airline", cascade = CascadeType.ALL, orphanRemoval = true)

@@ -9,7 +9,6 @@ public class AirplaneDto {
     private Integer places;
     private long airlineId;
 
-
     public String getName() {
         return name;
     }

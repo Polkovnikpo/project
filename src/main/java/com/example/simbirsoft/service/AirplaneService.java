@@ -23,7 +23,6 @@ public class AirplaneService {
     }
 
     public AirplaneDto createAirplane(AirplaneDto dto) {
-        log.info("Создание нового самолета с данными: {}", dto);
         Airplane airplane = mapDtoToAirplane(dto);
         Airline airline = airlineRepository.findById(dto.getAirlineId()).orElseThrow();
         airplane.setAirline(airline);
@@ -35,38 +34,35 @@ public class AirplaneService {
 
 
     public AirplaneDto updateAirplane(Long id, AirplaneDto dto) {
-        log.info("Обновление самолета с ID: {}, новые данные: {}", id, dto);
-        Optional<Airplane> airplaneOptional = airplaneRepository.findById(id);
-        if (airplaneOptional.isPresent()) {
-            Airplane airplane = airplaneOptional.get();
-            airplane.setName(dto.getName());
-            airplane.setModel(dto.getModel());
-            airplane.setPlaces(dto.getPlaces());
-            airplaneRepository.save(airplane);
-            AirplaneDto airplaneDto = mapAirplaneToDto(airplane);
-            log.info("Самолет с ID {} успешно обновлен", id);
-            return airplaneDto;
-        } else {
-            log.warn("Самолет с ID {} не найден для обновления", id);
-            return null;
-        }
+        Airplane airplane = airplaneRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.error("Самолет с ID: {} не найден", id);
+                    return new IllegalArgumentException("Самолет не найден");
+                });
+
+        airplane.setName(dto.getName());
+        airplane.setModel(dto.getModel());
+        airplane.setPlaces(dto.getPlaces());
+
+        airplaneRepository.save(airplane);
+
+        AirplaneDto airplaneDto = mapAirplaneToDto(airplane);
+        log.info("Самолет с ID {} успешно обновлен", id);
+        return airplaneDto;
     }
 
     public AirplaneDto getAirplaneById(Long id) {
-        log.info("Получение самолета с ID: {}", id);
-        Optional<Airplane> airplane = airplaneRepository.findById(id);
-        if (airplane.isPresent()) {
-            AirplaneDto airplaneDto = mapAirplaneToDto(airplane.get());
-            log.info("Самолет с ID {} успешно получен: {}", id, airplaneDto);
-            return airplaneDto;
-        } else {
-            log.warn("Самолет с ID {} не найден", id);
-            return null;
-        }
+        Airplane airplane = airplaneRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.error("Самолет с ID: {} не найден", id);
+                    return new IllegalArgumentException("Самолет не найден");
+                });
+        AirplaneDto airplaneDto = mapAirplaneToDto(airplane);
+        log.info("Самолет с ID {} успешно получен: {}", id, airplaneDto);
+        return airplaneDto;
     }
 
     public void deleteAirplaneById(Long id) {
-        log.info("Удаление самолета с ID: {}", id);
         try {
             airplaneRepository.deleteById(id);
             log.info("Самолет с ID {} успешно удален", id);
@@ -76,7 +72,6 @@ public class AirplaneService {
     }
 
     public Airplane mapDtoToAirplane(AirplaneDto dto) {
-        log.debug("Маппинг объекта AirplaneDto в Airplane: {}", dto);
         Airplane airplane = new Airplane();
         airplane.setName(dto.getName());
         airplane.setModel(dto.getModel());
@@ -85,7 +80,6 @@ public class AirplaneService {
     }
 
     public AirplaneDto mapAirplaneToDto(Airplane airplane) {
-        log.debug("Маппинг объекта Airplane в AirplaneDto: {}", airplane);
         AirplaneDto airplaneDto = new AirplaneDto();
         airplaneDto.setName(airplane.getName());
         airplaneDto.setModel(airplane.getModel());
