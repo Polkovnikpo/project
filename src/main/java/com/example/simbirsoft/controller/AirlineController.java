@@ -11,27 +11,26 @@ import org.springframework.web.bind.annotation.*;
 public class AirlineController {
     public AirlineService airlineService;
 
-    @Autowired
     public AirlineController(AirlineService airlineService) {
         this.airlineService = airlineService;
     }
 
     @PostMapping(value = "/create")
     public ResponseEntity<AirlineDto> createAirline(@RequestBody AirlineDto dto) {
-        AirlineDto createAirplane = airlineService.createAirline(dto);
-        return ResponseEntity.ok(createAirplane);
+        AirlineDto createdAirplane = airlineService.createAirline(dto);
+        return ResponseEntity.ok(createdAirplane);
     }
 
     @PutMapping(value = "/update/{id}")
     public ResponseEntity<AirlineDto> updateAirline(@PathVariable("id") Long id, @RequestBody AirlineDto dto) {
-        AirlineDto updateAirline = airlineService.updateAirline(id, dto);
-        return ResponseEntity.ok(updateAirline);
+        AirlineDto updatedAirline = airlineService.updateAirline(id, dto);
+        return ResponseEntity.ok(updatedAirline);
     }
 
     @GetMapping(value = "/get/{id}")
     public ResponseEntity<AirlineDto> getAirlineById(@PathVariable("id") Long id) {
-        AirlineDto getAirline = airlineService.getAirlineById(id);
-        return ResponseEntity.ok(getAirline);
+        AirlineDto airline = airlineService.getAirlineById(id);
+        return ResponseEntity.ok(airline);
     }
 
     @DeleteMapping(value = "/delete/{id}")
@@ -42,7 +41,7 @@ public class AirlineController {
 
     @GetMapping("/tickets/count/{airlineId}")
     public ResponseEntity<Integer> getTicketCountByAirlineId(@PathVariable Long airlineId) {
-        Integer ticketCount = airlineService.getTicketsCountByAirlineId(airlineId);
-        return ResponseEntity.ok(ticketCount);
+        Integer ticketsCount = airlineService.getTicketsCountByAirlineId(airlineId);
+        return ResponseEntity.ok(ticketsCount);
     }
 }

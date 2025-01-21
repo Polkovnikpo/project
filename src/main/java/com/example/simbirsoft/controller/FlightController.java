@@ -12,27 +12,26 @@ public class FlightController {
 
     private FlightService flightService;
 
-    @Autowired
     public FlightController(FlightService flightService) {
         this.flightService = flightService;
     }
 
     @PostMapping
     public ResponseEntity<FlightDto> createFlight(@RequestBody FlightDto dto) {
-        FlightDto createFlight = flightService.createFlight(dto);
-        return ResponseEntity.ok(createFlight);
+        FlightDto createdFlight = flightService.createFlight(dto);
+        return ResponseEntity.ok(createdFlight);
     }
 
     @PutMapping(value = "/{id}")
     public ResponseEntity<FlightDto> updateFlight(@PathVariable("id") Long id, @RequestBody FlightDto dto) {
-        FlightDto updateFlight = flightService.updateFlight(id, dto);
-        return ResponseEntity.ok(updateFlight);
+        FlightDto updatedFlight = flightService.updateFlight(id, dto);
+        return ResponseEntity.ok(updatedFlight);
     }
 
     @GetMapping(value = "/{id}")
     public ResponseEntity<FlightDto> getFlightById(@PathVariable("id") Long id) {
-        FlightDto getFlight = flightService.getFlightById(id);
-        return ResponseEntity.ok(getFlight);
+        FlightDto flight = flightService.getFlightById(id);
+        return ResponseEntity.ok(flight);
     }
 
     @DeleteMapping(value = "/{id}")

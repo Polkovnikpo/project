@@ -1,5 +1,6 @@
 package com.example.simbirsoft.controller;
 
+import com.example.simbirsoft.dto.CreateTicketDto;
 import com.example.simbirsoft.dto.TicketDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -14,33 +15,27 @@ public class TicketController {
 
     private TicketService ticketService;
 
-    @Autowired
     public TicketController(TicketService ticketService) {
         this.ticketService = ticketService;
     }
 
     @PostMapping(value = "/create")
-    public ResponseEntity<TicketDto> createTicket(@RequestBody TicketDto dto) {
-        TicketDto createTicket = ticketService.createTicket(dto);
-        return ResponseEntity.ok(createTicket);
+    public ResponseEntity<CreateTicketDto> createTicket(@RequestBody CreateTicketDto createTicketDto) {
+            CreateTicketDto createdTicket =  ticketService.createTicket(createTicketDto);
+            return ResponseEntity.ok(createdTicket);
     }
 
-    @PostMapping(value = "/commission")
-    ResponseEntity<TicketDto> createTicketWithCommission(@RequestBody TicketDto dto, @RequestParam BigDecimal commission) {
-        TicketDto ticketWithCommission = ticketService.createTicketWithCommission(dto, commission);
-        return ResponseEntity.ok(ticketWithCommission);
-    }
 
     @PutMapping(value = "/{id}")
     public ResponseEntity<TicketDto> updateTicket(@PathVariable("id") Long id, @RequestBody TicketDto dto) {
-        TicketDto updateTicket = ticketService.updateTicketById(id, dto);
-        return ResponseEntity.ok(updateTicket);
+        TicketDto updatedTicket = ticketService.updateTicketById(id, dto);
+        return ResponseEntity.ok(updatedTicket);
     }
 
     @GetMapping(value = "/{id}")
     public ResponseEntity<TicketDto> getTicket(@PathVariable("id") Long id) {
-        TicketDto getTicket = ticketService.getTicketById(id);
-        return ResponseEntity.ok(getTicket);
+        TicketDto ticket = ticketService.getTicketById(id);
+        return ResponseEntity.ok(ticket);
     }
 
     @GetMapping(value = "/ticketCountByStartingPoint")
