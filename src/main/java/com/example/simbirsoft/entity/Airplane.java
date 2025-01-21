@@ -15,13 +15,13 @@ public class Airplane {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column
+    @Column(name = "model")
     private String name;
 
-    @Column
+    @Column(name = "model")
     private String model;
 
-    @Column
+    @Column(name = "places")
     private Integer places;
 
     @OneToMany(mappedBy = "airplane", cascade = CascadeType.ALL, orphanRemoval = true)

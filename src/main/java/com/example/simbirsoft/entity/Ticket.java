@@ -19,14 +19,14 @@ public class Ticket {
     @JoinColumn(name = "flight_id", nullable = false)
     private Flight flight;
 
-    @Column
+    @Column(name = "price")
     private BigDecimal price;
 
     @Enumerated(EnumType.STRING)
-    @Column
+    @Column(name = "status")
     private TicketStatus status;
 
-    @Column(nullable = false)
+    @Column(name = "is_commission", nullable = false)
     private boolean isCommission;
 
     public Long getId() {
@@ -45,7 +45,7 @@ public class Ticket {
         return status;
     }
 
-    public boolean isIsCommission() {
+    public boolean isCommission() {
         return isCommission;
     }
 

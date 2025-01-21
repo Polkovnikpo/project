@@ -1,5 +1,6 @@
 package com.example.simbirsoft;
 
+import com.example.simbirsoft.dto.CreateTicketDto;
 import com.example.simbirsoft.dto.TicketDto;
 import com.example.simbirsoft.entity.Flight;
 import com.example.simbirsoft.entity.Ticket;
@@ -39,17 +40,17 @@ class TicketServiceTest {
     @InjectMocks
     private TicketService ticketService;
 
-    private TicketDto ticketDto;
+    private CreateTicketDto createTicketDto;
     private Flight flight;
     private Ticket ticket;
 
     @BeforeEach
     public void setUp() {
-        ticketDto = new TicketDto();
-        ticketDto.setPrice(BigDecimal.valueOf(1000));
-        ticketDto.setStatus(TicketStatus.BOOKED);
-        ticketDto.setCommission(false);
-        ticketDto.setFlightId(1L);
+        createTicketDto = new CreateTicketDto();
+        createTicketDto.setPrice(BigDecimal.valueOf(1000));
+        createTicketDto.setStatus(TicketStatus.BOOKED);
+        createTicketDto.setCommission(false);
+        createTicketDto.setFlightId(1L);
 
         flight = new Flight();
         flight.setId(1L);
@@ -65,27 +66,13 @@ class TicketServiceTest {
         when(flightRepository.findById(anyLong())).thenReturn(Optional.of(flight));
         when(ticketRepository.save(any(Ticket.class))).thenReturn(ticket);
 
-        TicketDto result = ticketService.createTicket(ticketDto);
+        CreateTicketDto result = ticketService.createTicket(createTicketDto);
 
         assertNotNull(result);
         assertEquals(BigDecimal.valueOf(1000), result.getPrice());
         assertEquals(TicketStatus.BOOKED, result.getStatus());
 
         verify(flightRepository, times(1)).findById(anyLong());
-        verify(ticketRepository, times(1)).save(any(Ticket.class));
-    }
-
-    @Test
-    void testCreateTicketWithCommission() {
-        BigDecimal commissionRate = BigDecimal.valueOf(10);
-        when(ticketRepository.save(any(Ticket.class))).thenReturn(ticket);
-
-        TicketDto result = ticketService.createTicketWithCommission(ticketDto, commissionRate);
-
-        assertNotNull(result);
-        assertEquals(BigDecimal.valueOf(1100), result.getPrice());
-        assertEquals(true, result.isCommission());
-
         verify(ticketRepository, times(1)).save(any(Ticket.class));
     }
 

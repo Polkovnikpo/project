@@ -19,16 +19,16 @@ public class Flight {
     @JoinColumn(name = "airplane_id", nullable = false)
     private Airplane airplane;
 
-    @Column
+    @Column(name = "starting_point")
     private String startingPoint;
 
-    @Column
+    @Column(name = "destination_point")
     private String destinationPoint;
 
-    @Column
+    @Column(name = "departure_time")
     private LocalDateTime departureTime;
 
-    @Column
+    @Column(name = "arrival_time")
     private LocalDateTime arrivalTime;
 
     @OneToMany(mappedBy = "flight", cascade = CascadeType.ALL, orphanRemoval = true)

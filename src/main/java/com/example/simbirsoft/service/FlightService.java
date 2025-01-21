@@ -33,33 +33,35 @@ public class FlightService {
     }
 
     public FlightDto updateFlight(Long id, FlightDto dto) {
-        Optional<Flight> flightOptional = flightRepository.findById(id);
-        if (flightOptional.isPresent()) {
-            Flight flight = flightOptional.get();
-            flight.setDepartureTime(dto.getDepartureTime());
-            flight.setArrivalTime(dto.getArrivalTime());
-            flight.setStartingPoint(dto.getStartingPoint());
-            flight.setDestinationPoint(dto.getDestinationPoint());
-            flightRepository.save(flight);
-            FlightDto flightDto = mapFlightToDto(flight);
-            log.info("Рейс с ID {} успешно обновлен", id);
-            return flightDto;
-        } else {
-            log.info("Рейс с ID {} не найден для обновления", id);
-            return null;
-        }
+        Flight flight = flightRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.error("Рейс с ID: {} не найден", id);
+                    return new IllegalArgumentException("Рейс не найден");
+                });
+
+        flight.setDepartureTime(dto.getDepartureTime());
+        flight.setArrivalTime(dto.getArrivalTime());
+        flight.setStartingPoint(dto.getStartingPoint());
+        flight.setDestinationPoint(dto.getDestinationPoint());
+
+        flightRepository.save(flight);
+
+        FlightDto flightDto = mapFlightToDto(flight);
+        log.info("Рейс с ID {} успешно обновлен", id);
+        return flightDto;
     }
 
     public FlightDto getFlightById(Long id) {
-        Optional<Flight> flightOptional = flightRepository.findById(id);
-        if (flightOptional.isPresent()) {
-            FlightDto flightDto = mapFlightToDto(flightOptional.get());
-            log.info("Рейс с ID {} получен: {}", id, flightDto);
-            return flightDto;
-        } else {
-            log.info("Рейс с ID {} не найден", id);
-            return null;
-        }
+        Flight flight = flightRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.error("Рeйс с ID {} не найден", id);
+                    return new IllegalArgumentException("Руйс не найден");
+                });
+
+        FlightDto flightDto = mapFlightToDto(flight);
+
+        log.info("Рейс с ID {} получен: {}", id, flightDto);
+        return flightDto;
     }
 
     public void deleteFlightDto(Long id) {
@@ -72,7 +74,6 @@ public class FlightService {
     }
 
     public Flight mapDtoToFlight(FlightDto flightDto) {
-        log.debug("Маппинг объекта FlightDto в Flight", flightDto);
         Flight flight = new Flight();
         flight.setArrivalTime(flightDto.getArrivalTime());
         flight.setDepartureTime(flightDto.getDepartureTime());
@@ -82,7 +83,6 @@ public class FlightService {
     }
 
     public FlightDto mapFlightToDto(Flight flight) {
-        log.debug("Маппинг объекта Flight в FlightDto", flight);
         FlightDto flightDto = new FlightDto();
         flightDto.setArrivalTime(flight.getArrivalTime());
         flightDto.setDepartureTime(flight.getDepartureTime());

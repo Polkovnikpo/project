@@ -1,4 +1,4 @@
-package com.example.simbirsoft;
+package com.example.simbirsoft.simbirsoft;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

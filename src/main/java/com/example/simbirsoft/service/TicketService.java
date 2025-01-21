@@ -1,5 +1,6 @@
 package com.example.simbirsoft.service;
 
+import com.example.simbirsoft.dto.CreateTicketDto;
 import com.example.simbirsoft.dto.TicketDto;
 import com.example.simbirsoft.entity.Flight;
 import com.example.simbirsoft.entity.Ticket;
@@ -26,7 +27,6 @@ public class TicketService {
 
     private final AirplaneRepository airplaneRepository;
 
-    @Autowired
     public TicketService(TicketRepository ticketRepository,
                          FlightRepository flightRepository,
                          AirplaneRepository airplaneRepository) {
@@ -36,60 +36,60 @@ public class TicketService {
     }
 
 
-    public TicketDto createTicket(TicketDto dto) {
-        Ticket ticket = mapDtoToTicket(dto);
-        Flight flight = flightRepository.findById(dto.getFlightId())
-                .orElseThrow(() -> new NoSuchElementException("Рейс не найден с ID = " + dto.getFlightId()));
-        ticket.setFlight(flight);
-        ticketRepository.save(ticket);
-        TicketDto ticketDto = mapTicketToDto(ticket);
-        log.info("Билет успешно создан");
-        return ticketDto;
-    }
+    public CreateTicketDto createTicket(CreateTicketDto createTicketDto) {
+        Ticket ticket = mapCreateTicketDtoToTicket(createTicketDto);
 
-    public TicketDto createTicketWithCommission(TicketDto dto, BigDecimal commissionRate) {
-        log.info("Создание билета с комиссией: {}, ставка комиссии: {}", dto, commissionRate);
-        Ticket ticket = mapDtoToTicket(dto);
-        int commissionPrice = calculateCommission(ticket.getPrice(), commissionRate);
-        ticket.setPrice(BigDecimal.valueOf(commissionPrice));
-        ticket.setIsCommission(true);
+        Flight flight = flightRepository.findById(createTicketDto.getFlightId())
+                .orElseThrow(() -> new NoSuchElementException("Рейс не найден с ID = " + createTicketDto.getFlightId()));
+        ticket.setFlight(flight);
+
+        if(createTicketDto.isCommission()){
+            BigDecimal commissionPrice = calculateCommission(ticket.getPrice(), createTicketDto.getCommission());
+            ticket.setPrice(ticket.getPrice().add(commissionPrice));
+            ticket.setIsCommission(true);
+        } else {
+            ticket.setIsCommission(false);
+        }
+
         ticketRepository.save(ticket);
-        TicketDto result = mapTicketToDto(ticket);
-        log.info("Билет с комиссией успешно создан: {}", result);
+
+        CreateTicketDto result = mapTicketToCreateTicketDto(ticket);
+        log.info("Билет успешно создан");
         return result;
     }
 
-    private int calculateCommission(BigDecimal basePrice, BigDecimal commissionRate) {
+    private BigDecimal calculateCommission(BigDecimal basePrice, BigDecimal commissionRate) {
         BigDecimal commission = basePrice.multiply(commissionRate.divide(BigDecimal.valueOf(100)));
-        return basePrice.add(commission).setScale(0, RoundingMode.HALF_UP).intValue();
+        return basePrice.add(commission).setScale(2, RoundingMode.HALF_UP);
     }
 
     public TicketDto updateTicketById(Long id, TicketDto dto) {
-        Optional<Ticket> optionalTicket = ticketRepository.findById(id);
-        if (optionalTicket.isPresent()) {
-            Ticket ticket = new Ticket();
-            ticket.setPrice(dto.getPrice());
-            ticket.setStatus(dto.getStatus());
-            ticketRepository.save(ticket);
-            log.info("Билет с ID {} успешно обновлен", id);
-            TicketDto ticketDto = mapTicketToDto(ticket);
-            return ticketDto;
-        } else {
-            log.warn("Билет с ID {} не найден для обновления", id);
-            return null;
-        }
+        Ticket ticket = ticketRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.error("Билет с ID {} не найден", id);
+                    return new IllegalArgumentException("Билет не найден");
+                });
+
+        ticket.setPrice(dto.getPrice());
+        ticket.setStatus(dto.getStatus());
+        ticketRepository.save(ticket);
+
+        log.info("Билет с ID {} успешно обновлен", id);
+
+        TicketDto ticketDto = mapTicketToDto(ticket);
+        return ticketDto;
     }
 
     public TicketDto getTicketById(Long id) {
-        Optional<Ticket> ticketOptional = ticketRepository.findById(id);
-        if (ticketOptional.isPresent()) {
-            TicketDto ticketDto = mapTicketToDto(ticketOptional.get());
-            log.info("Билет с ID {} успешно получен: {}", id, ticketDto);
-            return ticketDto;
-        } else {
-            log.warn("Билет с ID {} не найден для получения", id);
-            return null;
-        }
+        Ticket ticket = ticketRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.error("Билет с ID {} не найден", id);
+                    return new IllegalArgumentException("Билет не найден");
+                });
+
+        TicketDto ticketDto = mapTicketToDto(ticket);
+        log.info("Билет с ID {} успешно получен: {}", id, ticketDto);
+        return ticketDto;
     }
 
     public void deleteTicketById(Long id) {
@@ -135,7 +135,6 @@ public class TicketService {
     }
 
     public Ticket mapDtoToTicket(TicketDto ticketDto) {
-        log.debug("Маппинг объекта TicketDto в Ticket: {}", ticketDto);
         Ticket ticket = new Ticket();
         ticket.setPrice(ticketDto.getPrice());
         ticket.setStatus(ticketDto.getStatus());
@@ -143,12 +142,27 @@ public class TicketService {
         return ticket;
     }
 
+   public CreateTicketDto mapTicketToCreateTicketDto(Ticket ticket) {
+        CreateTicketDto createTicketDto = new CreateTicketDto();
+        createTicketDto.setPrice(ticket.getPrice());
+        createTicketDto.setStatus(ticket.getStatus());
+        createTicketDto.setCommission(ticket.isCommission());
+        return  createTicketDto;
+    }
+
+    public Ticket mapCreateTicketDtoToTicket(CreateTicketDto createTicketDto) {
+        Ticket ticket = new Ticket();
+        ticket.setPrice(createTicketDto.getPrice());
+        ticket.setStatus(createTicketDto.getStatus());
+        ticket.setIsCommission(createTicketDto.isCommission());
+        return ticket;
+    }
+
     public TicketDto mapTicketToDto(Ticket ticket) {
-        log.debug("Маппинг объекта Ticket в TicketDto: {}", ticket);
         TicketDto ticketDto = new TicketDto();
         ticketDto.setPrice(ticket.getPrice());
         ticketDto.setStatus(ticket.getStatus());
-        ticketDto.setCommission(ticket.isIsCommission());
+        ticketDto.setCommission(ticket.isCommission());
         return ticketDto;
     }
 }
