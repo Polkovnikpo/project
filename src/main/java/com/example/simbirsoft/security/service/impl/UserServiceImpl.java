@@ -7,7 +7,6 @@ import com.example.simbirsoft.security.repository.RoleRepository;
 import com.example.simbirsoft.security.repository.UserRepository;
 import com.example.simbirsoft.security.service.UserService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +21,6 @@ public class UserServiceImpl implements UserService {
     private final RoleRepository roleRepository;
     private final BCryptPasswordEncoder passwordEncoder;
 
-    @Autowired
     public UserServiceImpl(UserRepository userRepository,
                            RoleRepository roleRepository,
                            BCryptPasswordEncoder passwordEncoder) {
@@ -43,8 +41,16 @@ public class UserServiceImpl implements UserService {
 
         User registerUser = userRepository.save(user);
 
-        log.info("Пользователь: {} успешно зарегистрирован");
+        log.info("Пользователь: {} успешно зарегистрирован", user.getUserName());
 
         return registerUser;
     }
+
+    @Override
+    public User findByUsername(String username){
+        User result = userRepository.findByUsername(username);
+        log.info("В методе findUsername - пользователь: {} найден по имени пользователя: {}",result,username);
+        return result;
+    }
+
 }
