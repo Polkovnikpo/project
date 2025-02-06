@@ -1,8 +1,5 @@
 package com.example.simbirsoft.dto;
 
-import lombok.Data;
-
-@Data
 public class AirplaneDto {
     private String name;
     private String model;

@@ -1,11 +1,9 @@
 package com.example.simbirsoft.dto;
 
 import com.example.simbirsoft.entity.TicketStatus;
-import lombok.Data;
 
 import java.math.BigDecimal;
 
-@Data
 public class TicketDto {
     private BigDecimal price;
     private TicketStatus status;

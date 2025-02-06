@@ -31,6 +31,10 @@ public class Flight {
     @Column
     private LocalDateTime arrivalTime;
 
+    @Enumerated(EnumType.STRING)
+    @Column
+    private FlightStatus status;
+
     @OneToMany(mappedBy = "flight", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Ticket> tickets;
 
@@ -88,5 +92,13 @@ public class Flight {
 
     public void setTickets(List<Ticket> tickets) {
         this.tickets = tickets;
+    }
+
+    public FlightStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(FlightStatus status) {
+        this.status = status;
     }
 }

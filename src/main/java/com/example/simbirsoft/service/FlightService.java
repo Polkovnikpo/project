@@ -5,16 +5,18 @@ import com.example.simbirsoft.entity.Airplane;
 import com.example.simbirsoft.entity.Flight;
 import com.example.simbirsoft.repository.AirplaneRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import com.example.simbirsoft.repository.FlightRepository;
 
 import java.awt.event.WindowFocusListener;
 import java.util.Optional;
 
-@Slf4j
 @Service
 public class FlightService {
 
+    private final static Logger log = LoggerFactory.getLogger(FlightService.class);
     private final FlightRepository flightRepository;
     private final AirplaneRepository airplaneRepository;
 

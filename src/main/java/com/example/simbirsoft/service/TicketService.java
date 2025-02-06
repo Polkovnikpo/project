@@ -2,36 +2,49 @@ package com.example.simbirsoft.service;
 
 import com.example.simbirsoft.dto.TicketDto;
 import com.example.simbirsoft.entity.Flight;
+import com.example.simbirsoft.entity.FlightStatus;
 import com.example.simbirsoft.entity.Ticket;
+import com.example.simbirsoft.entity.TicketStatus;
 import com.example.simbirsoft.repository.AirplaneRepository;
 import com.example.simbirsoft.repository.FlightRepository;
 import com.example.simbirsoft.repository.TicketRepository;
+import com.example.simbirsoft.security.service.UserService;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
-@Slf4j
 @Service
 public class TicketService {
 
+    private final static Logger log = LoggerFactory.getLogger(TicketService.class);
     private final TicketRepository ticketRepository;
-
     private final FlightRepository flightRepository;
-
     private final AirplaneRepository airplaneRepository;
+    private final UserService userService;
+
+    @Value("${ticket.commission}")
+    private BigDecimal commission;
 
     @Autowired
     public TicketService(TicketRepository ticketRepository,
                          FlightRepository flightRepository,
-                         AirplaneRepository airplaneRepository) {
+                         AirplaneRepository airplaneRepository,
+                         UserService userService) {
         this.ticketRepository = ticketRepository;
         this.flightRepository = flightRepository;
         this.airplaneRepository = airplaneRepository;
+        this.userService = userService;
     }
 
     public TicketDto createTicket(TicketDto ticketDto) {
@@ -44,10 +57,10 @@ public class TicketService {
         return dto;
     }
 
-    public TicketDto createTicketWithCommission(TicketDto dto, BigDecimal commissionRate) {
-        log.info("Создание билета с комиссией: {}, ставка комиссии: {}", dto, commissionRate);
+    public TicketDto createTicketWithCommission(TicketDto dto) {
+        log.info("Создание билета с комиссией: {}, ставка комиссии: {}", dto, commission);
         Ticket ticket = mapDtoToTicket(dto);
-        int commissionPrice = calculateCommission(ticket.getPrice(), commissionRate);
+        int commissionPrice = calculateCommission(ticket.getPrice(), commission);
         ticket.setPrice(BigDecimal.valueOf(commissionPrice));
         ticket.setIsCommission(true);
         ticketRepository.save(ticket);
@@ -99,11 +112,13 @@ public class TicketService {
     }
 
     public Integer getTicketCountByStartingPoint(String startingPoint) {
-        List<Flight> flights = flightRepository.findByStartingPoint(startingPoint);
+        List<Flight> flights = (List<Flight>) flightRepository.findByStartingPoint(startingPoint)
+                .orElseThrow(() -> new IllegalArgumentException("Рейс с данной отправной точкой не найден"));
 
         int count = flights.stream()
                 .flatMap(flight -> flight.getTickets().stream())
-                .toList().size();
+                .toList()
+                .size();
         log.info("Количество билетов для точки отправления {}: {}", startingPoint, count);
         return count;
     }
@@ -129,6 +144,15 @@ public class TicketService {
         BigDecimal average = sum.divide(BigDecimal.valueOf(ticketsCommission.size()), 2, RoundingMode.HALF_UP);
         log.info("Средняя комиссия: {}", average);
         return average;
+    }
+
+    public List<Ticket> getAllTickets(List<Ticket> allTickets, boolean showSold) {
+        if (showSold) {
+            return allTickets;
+        }
+        return allTickets.stream()
+                .filter(ticket -> ticket.getStatus() != TicketStatus.SOLD)
+                .collect(Collectors.toList());
     }
 
     public Ticket mapDtoToTicket(TicketDto ticketDto) {

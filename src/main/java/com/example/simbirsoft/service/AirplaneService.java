@@ -6,14 +6,16 @@ import com.example.simbirsoft.repository.AirplaneRepository;
 import com.example.simbirsoft.dto.AirplaneDto;
 import com.example.simbirsoft.entity.Airplane;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-@Slf4j
 @Service
 public class AirplaneService {
 
+    private final static Logger log = LoggerFactory.getLogger(AirlineService.class);
     private final AirplaneRepository airplaneRepository;
     private final AirlineRepository airlineRepository;
 

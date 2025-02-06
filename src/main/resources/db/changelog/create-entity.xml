@@ -6,10 +6,10 @@
     <changeSet id="1" author="Pimenova Polina">
         <createTable tableName="airline">
             <column name="id" type="BIGINT" autoIncrement="true">
-                <constraints primaryKey="true" />
+                <constraints primaryKey="true"/>
             </column>
             <column name="name" type="VARCHAR(255)">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
         </createTable>
     </changeSet>
@@ -17,41 +17,41 @@
     <changeSet id="2" author="Pimenova Polina">
         <createTable tableName="airplane">
             <column name="id" type="BIGINT" autoIncrement="true">
-                <constraints primaryKey="true" />
+                <constraints primaryKey="true"/>
             </column>
             <column name="model" type="VARCHAR(255)">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
             <column name="airline_id" type="BIGINT">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
         </createTable>
         <addForeignKeyConstraint baseTableName="airplane"
                                  baseColumnNames="airline_id"
                                  constraintName="fk_airplane_airline"
                                  referencedTableName="airline"
-                                 referencedColumnNames="id" />
+                                 referencedColumnNames="id"/>
     </changeSet>
 
     <changeSet id="3" author="Pimenova Polina">
         <createTable tableName="flight">
             <column name="id" type="BIGINT" autoIncrement="true">
-                <constraints primaryKey="true" />
+                <constraints primaryKey="true"/>
             </column>
             <column name="airplane_id" type="BIGINT">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
             <column name="starting_point" type="VARCHAR(255)">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
             <column name="destination_point" type="VARCHAR(255)">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
             <column name="departure_time" type="TIMESTAMP">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
             <column name="arrival_time" type="TIMESTAMP">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
         </createTable>
 
@@ -59,22 +59,22 @@
                                  baseColumnNames="airplane_id"
                                  constraintName="fk_flight_airplane"
                                  referencedTableName="airplane"
-                                 referencedColumnNames="id" />
+                                 referencedColumnNames="id"/>
     </changeSet>
 
     <changeSet id="4" author="Pimenova Polina">
         <createTable tableName="ticket">
             <column name="id" type="BIGINT" autoIncrement="true">
-                <constraints primaryKey="true" />
+                <constraints primaryKey="true"/>
             </column>
             <column name="flight_id" type="BIGINT">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
             <column name="price" type="DECIMAL(10,2)">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
             <column name="status" type="VARCHAR(50)">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
             <column name="is_commission" type="BOOLEAN">
                 <constraints nullable="false"/>
@@ -85,9 +85,135 @@
                                  baseColumnNames="flight_id"
                                  constraintName="fk_ticket_flight"
                                  referencedTableName="flight"
-                                 referencedColumnNames="id" />
+                                 referencedColumnNames="id"/>
     </changeSet>
 
+    <changeSet id="5" author="Pimenova Polina">
+        <createTable tableName="users">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="username" type="VARCHAR(100)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+
+            <column name="email" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+
+            <column name="password" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="status" type="VARCHAR(25)" defaultValue="ACTIVE">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="created" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="updated" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="6" author="Pimenova Polina">
+        <createTable tableName="roles">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="name" type="VARCHAR(100)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+
+            <column name="status" type="VARCHAR(25)" defaultValue="ACTIVE">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="created" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="updated" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="7" author="Pimenova Polina">
+        <createTable tableName="user_roles">
+            <column name="user_id" type="BIGINT">
+            </column>
+
+            <column name="role_id" type="BIGINT">
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="8" author="Pimenova Polina">
+        <addForeignKeyConstraint baseTableName="user_roles"
+                                 baseColumnNames="user_id"
+                                 constraintName="fk_user_roles_user"
+                                 onDelete="CASCADE"
+                                 onUpdate="RESTRICT"
+                                 referencedTableName="users"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="9" author="Pimenova Polina">
+        <addForeignKeyConstraint baseTableName="user_roles"
+                                 baseColumnNames="role_id"
+                                 constraintName="fk_user_roles_roles"
+                                 onDelete="CASCADE"
+                                 onUpdate="RESTRICT"
+                                 referencedTableName="roles"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="10" author="Pimenova Polina">
+        <insert tableName="roles">
+            <column name="name" value="ROLE_CASHIER"/>
+        </insert>
+
+        <insert tableName="roles">
+            <column name="name" value="ROLE_BUYER"/>
+        </insert>
+
+        <insert tableName="roles">
+            <column name="name" value="ROLE_MANAGER"/>
+        </insert>
+    </changeSet>
+    <changeSet id="11" author="Pimenova Polina">
+        <addColumn tableName="airplane">
+            <column name="name" type="VARCHAR(225)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="places" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="12" author="Pimenova Polina">
+        <addColumn tableName="ticket">
+            <column name="booking_expiration_time" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="13" author="Pimenova Polina">
+        <addColumn tableName="flight">
+            <column name="status" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="14" author="Pimenova Polina">
+        <dropColumn tableName="ticket" columnName="booking_expiration_time"/>
+    </changeSet>
 </databaseChangeLog>
 
 

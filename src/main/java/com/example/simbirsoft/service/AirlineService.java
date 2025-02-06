@@ -8,7 +8,10 @@ import com.example.simbirsoft.entity.Airline;
 import com.example.simbirsoft.entity.Airplane;
 import com.example.simbirsoft.entity.Flight;
 import com.example.simbirsoft.entity.Ticket;
+import com.example.simbirsoft.security.service.impl.UserServiceImpl;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import com.example.simbirsoft.repository.AirlineRepository;
 
@@ -16,9 +19,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@Slf4j
 @Service
 public class AirlineService {
+
+    private final static Logger log = LoggerFactory.getLogger(AirlineService.class);
     private final AirlineRepository airlineRepository;
 
     public AirlineService(AirlineRepository airlineRepository) {

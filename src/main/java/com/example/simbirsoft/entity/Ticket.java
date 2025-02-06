@@ -1,9 +1,11 @@
 package com.example.simbirsoft.entity;
 
+import com.example.simbirsoft.security.entity.User;
 import jakarta.persistence.*;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Entity
 @Data
@@ -25,8 +27,20 @@ public class Ticket {
     @Column
     private TicketStatus status;
 
+    @Column
+    private LocalDateTime bookingExpirationTime;
+
     @Column(nullable = false)
     private boolean isCommission;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "cashier_id", nullable = false)
+    private User cashier;
+
 
     public Long getId() {
         return id;
@@ -66,5 +80,37 @@ public class Ticket {
 
     public void setIsCommission(boolean commission) {
         isCommission = commission;
+    }
+
+    public boolean isCommission() {
+        return isCommission;
+    }
+
+    public void setCommission(boolean commission) {
+        isCommission = commission;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public User getCashier() {
+        return cashier;
+    }
+
+    public void setCashier(User cashier) {
+        this.cashier = cashier;
+    }
+
+    public LocalDateTime getBookingExpirationTime() {
+        return bookingExpirationTime;
+    }
+
+    public void setBookingExpirationTime(LocalDateTime bookingExpirationTime) {
+        this.bookingExpirationTime = bookingExpirationTime;
     }
 }

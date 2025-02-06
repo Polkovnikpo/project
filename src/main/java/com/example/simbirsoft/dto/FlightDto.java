@@ -1,5 +1,6 @@
 package com.example.simbirsoft.dto;
 
+import com.example.simbirsoft.entity.FlightStatus;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -10,6 +11,7 @@ public class FlightDto {
     private String destinationPoint;
     private LocalDateTime departureTime;
     private LocalDateTime arrivalTime;
+    private FlightStatus status;
     private long airplaneId;
 
     public String getStartingPoint() {
@@ -50,5 +52,13 @@ public class FlightDto {
 
     public void setAirplaneId(long airplaneId) {
         this.airplaneId = airplaneId;
+    }
+
+    public FlightStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(FlightStatus status) {
+        this.status = status;
     }
 }

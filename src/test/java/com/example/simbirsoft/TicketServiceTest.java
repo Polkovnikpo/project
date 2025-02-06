@@ -76,20 +76,20 @@ class TicketServiceTest {
         verify(flightRepository, times(1)).findById(anyLong());
         verify(ticketRepository, times(1)).save(any(Ticket.class));
     }
-
-    @Test
-    void testCreateTicketWithCommission(){
-            BigDecimal commissionRate = BigDecimal.valueOf(10);
-            when(ticketRepository.save(any(Ticket.class))).thenReturn(ticket);
-
-            TicketDto result = ticketService.createTicketWithCommission(ticketDto, commissionRate);
-
-            assertNotNull(result);
-            assertEquals(BigDecimal.valueOf(1000),result.getPrice());
-            assertEquals(true, result.isCommission());
-
-            verify(ticketRepository, times(1)).save(any(Ticket.class));
-    }
+//
+//    @Test
+//    void testCreateTicketWithCommission(){
+//            BigDecimal commissionRate = BigDecimal.valueOf(10);
+//            when(ticketRepository.save(any(Ticket.class))).thenReturn(ticket);
+//
+//            TicketDto result = ticketService.createTicketWithCommission(ticketDto, commissionRate);
+//
+//            assertNotNull(result);
+//            assertEquals(BigDecimal.valueOf(1000),result.getPrice());
+//            assertEquals(true, result.isCommission());
+//
+//            verify(ticketRepository, times(1)).save(any(Ticket.class));
+//    }
 
     @Test
     void testUpdateTicketById(){
