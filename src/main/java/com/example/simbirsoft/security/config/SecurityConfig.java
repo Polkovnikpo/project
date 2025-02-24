@@ -20,13 +20,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfig {
     private final JwtTokenProvider jwtTokenProvider;
+    private static final String MANAGER_ENDPOINT = "api/manager/**";
+    private static final String LOGIN_ENDPOINT = "api/auth/login";
+    private static final String BUYER_ENDPOINT = "api/buyer/**";
+    private static final String CASHIER_ENDPOINT = "api/cashier/**";
 
-    private static final String MANAGER_ENDPOINT = "api/v1/manager/**";
-    private static final String LOGIN_ENDPOINT = "api/v1/auth/login";
-    private static final String BAYER_ENDPOINT = "api/v1/bayer/**";
-    private static final String CASHIER_ENDPOINT = "api/v1/cashier/**";
-
-    @Autowired
     public SecurityConfig(JwtTokenProvider jwtTokenProvider) {
         this.jwtTokenProvider = jwtTokenProvider;
     }
@@ -40,7 +38,7 @@ public class SecurityConfig {
                         .requestMatchers(LOGIN_ENDPOINT).permitAll()
                         .requestMatchers(MANAGER_ENDPOINT).hasAuthority("ROLE_MANAGER")
                         .requestMatchers(CASHIER_ENDPOINT).hasAuthority("ROLE_CASHIER")
-                        .requestMatchers(BAYER_ENDPOINT).hasAuthority("ROLE_BAYER")
+                        .requestMatchers(BUYER_ENDPOINT).hasAuthority("ROLE_BUYER")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(new JwtTokenFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);

@@ -9,6 +9,7 @@ public class TicketDto {
     private TicketStatus status;
     private boolean isCommission;
     private long flightId;
+    private String message;
 
     public BigDecimal getPrice() {
         return price;
@@ -40,5 +41,13 @@ public class TicketDto {
 
     public void setFlightId(long flightId) {
         this.flightId = flightId;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 }

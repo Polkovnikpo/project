@@ -36,7 +36,6 @@ public class TicketService {
     @Value("${ticket.commission}")
     private BigDecimal commission;
 
-    @Autowired
     public TicketService(TicketRepository ticketRepository,
                          FlightRepository flightRepository,
                          AirplaneRepository airplaneRepository,
@@ -112,13 +111,17 @@ public class TicketService {
     }
 
     public Integer getTicketCountByStartingPoint(String startingPoint) {
-        List<Flight> flights = (List<Flight>) flightRepository.findByStartingPoint(startingPoint)
-                .orElseThrow(() -> new IllegalArgumentException("Рейс с данной отправной точкой не найден"));
+        List<Flight> flights = flightRepository.findByStartingPoint(startingPoint);
+
+        if(flights.isEmpty()){
+            throw new IllegalArgumentException("Рейс с данной отправной точкой не найден");
+        }
 
         int count = flights.stream()
                 .flatMap(flight -> flight.getTickets().stream())
                 .toList()
                 .size();
+
         log.info("Количество билетов для точки отправления {}: {}", startingPoint, count);
         return count;
     }
@@ -146,17 +149,15 @@ public class TicketService {
         return average;
     }
 
-    public List<Ticket> getAllTickets(List<Ticket> allTickets, boolean showSold) {
-        if (showSold) {
-            return allTickets;
-        }
-        return allTickets.stream()
-                .filter(ticket -> ticket.getStatus() != TicketStatus.SOLD)
-                .collect(Collectors.toList());
+    public List<TicketDto> getAllTickets(boolean showSold) {
+        List<Ticket> allTickets = ticketRepository.findAll();
+         return allTickets.stream()
+                    .filter(ticket -> showSold || ticket.getStatus() != TicketStatus.SOLD)
+                    .map(this::mapTicketToDto)
+                    .collect(Collectors.toList());
     }
 
     public Ticket mapDtoToTicket(TicketDto ticketDto) {
-        log.debug("Маппинг объекта TicketDto в Ticket: {}", ticketDto);
         Ticket ticket = new Ticket();
         ticket.setPrice(ticketDto.getPrice());
         ticket.setStatus(ticketDto.getStatus());
@@ -165,7 +166,6 @@ public class TicketService {
     }
 
     public TicketDto mapTicketToDto(Ticket ticket) {
-        log.debug("Маппинг объекта Ticket в TicketDto: {}", ticket);
         TicketDto ticketDto = new TicketDto();
         ticketDto.setPrice(ticket.getPrice());
         ticketDto.setStatus(ticket.getStatus());

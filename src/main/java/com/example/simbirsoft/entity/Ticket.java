@@ -37,10 +37,7 @@ public class Ticket {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne
-    @JoinColumn(name = "cashier_id", nullable = false)
-    private User cashier;
-
+    private String message;
 
     public Long getId() {
         return id;
@@ -98,13 +95,6 @@ public class Ticket {
         this.user = user;
     }
 
-    public User getCashier() {
-        return cashier;
-    }
-
-    public void setCashier(User cashier) {
-        this.cashier = cashier;
-    }
 
     public LocalDateTime getBookingExpirationTime() {
         return bookingExpirationTime;
@@ -112,5 +102,13 @@ public class Ticket {
 
     public void setBookingExpirationTime(LocalDateTime bookingExpirationTime) {
         this.bookingExpirationTime = bookingExpirationTime;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 }

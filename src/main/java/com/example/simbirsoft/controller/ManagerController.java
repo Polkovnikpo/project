@@ -1,7 +1,7 @@
 package com.example.simbirsoft.controller;
 
-import com.example.simbirsoft.service.Statistics;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.simbirsoft.entity.TicketStatus;
+import com.example.simbirsoft.service.ManagerService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,20 +11,19 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/v1/manager")
+@RequestMapping("/api/manager")
 public class ManagerController {
-    private final Statistics managerService;
+    private final ManagerService managerService;
 
-    @Autowired
-    public ManagerController(Statistics statistics) {
+    public ManagerController(ManagerService statistics) {
         this.managerService = statistics;
     }
 
     @GetMapping("/stats")
     public ResponseEntity<Map<String, Object>> getStatistics() {
         Map<String, Object> stats = new HashMap<>();
-        stats.put("soldTickets", managerService.countSoldTickets());
-        stats.put("bookedTickets", managerService.countBookedTickets());
+        stats.put("soldTickets", managerService.countTickets(TicketStatus.SOLD));
+        stats.put("bookedTickets", managerService.countTickets(TicketStatus.BOOKED));
         stats.put("totalTickets", managerService.getTotalRevenue());
 
         return ResponseEntity.ok(stats);

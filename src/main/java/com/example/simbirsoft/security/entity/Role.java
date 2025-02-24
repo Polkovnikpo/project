@@ -31,4 +31,12 @@ public class Role extends BaseEntity {
     public void setUsers(Set<User> users) {
         this.users = users;
     }
+
+    @Override
+    public String toString(){
+        return "Role{" +
+                "id=" + super.getId() + '\'' +
+                "name='" + name + '\'' +
+                '}';
+    }
 }

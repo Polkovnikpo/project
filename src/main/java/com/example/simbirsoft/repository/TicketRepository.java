@@ -5,6 +5,7 @@ import com.example.simbirsoft.entity.FlightStatus;
 import com.example.simbirsoft.entity.Ticket;
 import com.example.simbirsoft.entity.TicketStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -25,7 +26,8 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
     @Query("SELECT SUM(t.price) FROM Ticket t WHERE t.status = :status")
     BigDecimal sumPriceByStatus(@Param("status") TicketStatus status);
 
-    Optional<Ticket> findFirstByFlightAndStatus(Flight flight, TicketStatus status);
-
-    List<Ticket> findAllByStatusAndBookingExpirationTimeBefore(TicketStatus status, LocalDateTime time);
+    @Modifying
+    @Query("UPDATE Ticket t SET t.status = 'AVAILABLE', t.bookingExpirationTime = NULL " +
+            "WHERE t.status = 'BOOKED' AND t.bookingExpirationTime < :now")
+    int releaseExpiredBookings(@Param("now") LocalDateTime now);
 }

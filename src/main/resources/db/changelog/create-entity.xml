@@ -79,6 +79,9 @@
             <column name="is_commission" type="BOOLEAN">
                 <constraints nullable="false"/>
             </column>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="true"/>
+            </column>
         </createTable>
 
         <addForeignKeyConstraint baseTableName="ticket"
@@ -200,7 +203,7 @@
     <changeSet id="12" author="Pimenova Polina">
         <addColumn tableName="ticket">
             <column name="booking_expiration_time" type="TIMESTAMP">
-                <constraints nullable="false"/>
+                <constraints nullable="true"/>
             </column>
         </addColumn>
     </changeSet>
@@ -210,9 +213,6 @@
                 <constraints nullable="false"/>
             </column>
         </addColumn>
-    </changeSet>
-    <changeSet id="14" author="Pimenova Polina">
-        <dropColumn tableName="ticket" columnName="booking_expiration_time"/>
     </changeSet>
 </databaseChangeLog>
 

@@ -8,7 +8,6 @@ import com.example.simbirsoft.entity.Airline;
 import com.example.simbirsoft.entity.Airplane;
 import com.example.simbirsoft.entity.Flight;
 import com.example.simbirsoft.entity.Ticket;
-import com.example.simbirsoft.security.service.impl.UserServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +27,6 @@ public class AirlineService {
     public AirlineService(AirlineRepository airlineRepository) {
         this.airlineRepository = airlineRepository;
     }
-
 
     public Integer getTicketsCountByAirlineId(Long airlineId) {
         log.info("Получение количества билетов для авиакомпании с ID: {}", airlineId);
@@ -99,14 +97,12 @@ public class AirlineService {
 
 
     public AirlineDto mapAirlineToDto(Airline airline) {
-        log.debug("Маппинг объекта Airline в AirlineDto: {}", airline);
         AirlineDto airlineDto = new AirlineDto();
         airlineDto.setName(airline.getName());
         return airlineDto;
     }
 
     public Airline mapDtoToAirline(AirlineDto airlineDto) {
-        log.debug("Маппинг объекта AirlineDto в Airline: {}", airlineDto);
         Airline airline = new Airline();
         airline.setName(airlineDto.getName());
         return airline;

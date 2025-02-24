@@ -1,27 +1,26 @@
 package com.example.simbirsoft.controller;
 
+import com.example.simbirsoft.dto.TicketDto;
 import com.example.simbirsoft.entity.Ticket;
 import com.example.simbirsoft.service.BookingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/bayer")
+@RequestMapping("/api/buyer")
 public class BookingController {
     private final BookingService bookingService;
 
-    @Autowired
     public BookingController(BookingService bookingService) {
         this.bookingService = bookingService;
     }
 
-    @PostMapping("/book")
-    public ResponseEntity<Ticket> bookTicket(@RequestParam String startingPoint, @RequestParam Long userId){
-        Ticket BookedTicket = bookingService.bookTicket(startingPoint,userId);
-        return ResponseEntity.ok(BookedTicket);
+    @PostMapping("/{ticketId}/book")
+    @PreAuthorize("hasRole('ROLE_BUYER')")
+    public ResponseEntity<TicketDto> bookTicket(@PathVariable Long ticketId){
+        TicketDto bookedTicket = bookingService.bookTicket(ticketId);
+        return ResponseEntity.ok(bookedTicket);
     }
 }

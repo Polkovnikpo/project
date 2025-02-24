@@ -3,14 +3,19 @@ package com.example.simbirsoft.service;
 import com.example.simbirsoft.dto.FlightDto;
 import com.example.simbirsoft.entity.Airplane;
 import com.example.simbirsoft.entity.Flight;
+import com.example.simbirsoft.entity.FlightStatus;
 import com.example.simbirsoft.repository.AirplaneRepository;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.web.WebProperties;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import com.example.simbirsoft.repository.FlightRepository;
 
 import java.awt.event.WindowFocusListener;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -74,8 +79,17 @@ public class FlightService {
         }
     }
 
+    @Scheduled(fixedRate = 60000)
+    @Transactional
+    public void updateFlightStatus() {
+        LocalDateTime now = LocalDateTime.now();
+
+        flightRepository.updateStatusInProcess(now);
+
+        flightRepository.updateStatusInCompleted(now);
+    }
+
     public Flight mapDtoToFlight(FlightDto flightDto) {
-        log.debug("Маппинг объекта FlightDto в Flight", flightDto);
         Flight flight = new Flight();
         flight.setArrivalTime(flightDto.getArrivalTime());
         flight.setDepartureTime(flightDto.getDepartureTime());
@@ -85,7 +99,6 @@ public class FlightService {
     }
 
     public FlightDto mapFlightToDto(Flight flight) {
-        log.debug("Маппинг объекта Flight в FlightDto", flight);
         FlightDto flightDto = new FlightDto();
         flightDto.setArrivalTime(flight.getArrivalTime());
         flightDto.setDepartureTime(flight.getDepartureTime());

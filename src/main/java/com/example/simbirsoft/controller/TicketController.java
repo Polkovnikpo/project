@@ -14,11 +14,9 @@ import java.util.List;
 @RestController
 @RequestMapping("/ticket")
 public class TicketController {
-
     private final TicketRepository ticketRepository;
     private TicketService ticketService;
 
-    @Autowired
     public TicketController(TicketService ticketService, TicketRepository ticketRepository) {
         this.ticketService = ticketService;
         this.ticketRepository = ticketRepository;
@@ -61,10 +59,9 @@ public class TicketController {
     }
 
     @GetMapping("/showSold")
-    public ResponseEntity<List<Ticket>> getTickets(@RequestParam(value = "showSold", defaultValue = "false") boolean showSold) {
-        List<Ticket> allTickets = ticketRepository.findAll();
-        List<Ticket> filterTickets = ticketService.getAllTickets(allTickets, showSold);
-        return ResponseEntity.ok(filterTickets);
+    public ResponseEntity<List<TicketDto>> getTickets(@RequestParam(value = "showSold", defaultValue = "false") boolean showSold) {
+        List<TicketDto> filteredTickets = ticketService.getAllTickets(showSold);
+        return ResponseEntity.ok(filteredTickets);
     }
 
     @DeleteMapping(value = "/{id}")

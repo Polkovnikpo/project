@@ -78,7 +78,6 @@ public class AirplaneService {
     }
 
     public Airplane mapDtoToAirplane(AirplaneDto dto) {
-        log.debug("Маппинг объекта AirplaneDto в Airplane: {}", dto);
         Airplane airplane = new Airplane();
         airplane.setName(dto.getName());
         airplane.setModel(dto.getModel());
@@ -87,7 +86,6 @@ public class AirplaneService {
     }
 
     public AirplaneDto mapAirplaneToDto(Airplane airplane) {
-        log.debug("Маппинг объекта Airplane в AirplaneDto: {}", airplane);
         AirplaneDto airplaneDto = new AirplaneDto();
         airplaneDto.setName(airplane.getName());
         airplaneDto.setModel(airplane.getModel());

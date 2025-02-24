@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 public class AirlineController {
     public AirlineService airlineService;
 
-    @Autowired
     public AirlineController(AirlineService airlineService) {
         this.airlineService = airlineService;
     }
