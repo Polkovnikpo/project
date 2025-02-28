@@ -1,17 +1,29 @@
 package com.example.simbirsoft.dto;
 
 import com.example.simbirsoft.entity.FlightStatus;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 
-@Data
+@Schema(description = "Информация о рейсе")
 public class FlightDto {
+    @Schema(description = "Начальная точка рейса", example = "Казань")
     private String startingPoint;
+
+    @Schema(description = "Конечная точка рейса", example = "Москва")
     private String destinationPoint;
+
+    @Schema(description = "Время отправления рейса", example = "2025-02-28T10:30:00")
     private LocalDateTime departureTime;
+
+    @Schema(description = "Время прибытия рейса", example = "2025-02-28T12:30:00")
     private LocalDateTime arrivalTime;
+
+    @Schema(description = "Статус рейса", example = "IN_PROCESS")
     private FlightStatus status;
+
+    @Schema(description = "Идентификатор самолета, назначенного на рейс", example = "123")
     private long airplaneId;
 
     public String getStartingPoint() {

@@ -114,7 +114,7 @@ public class TicketService {
         List<Flight> flights = flightRepository.findByStartingPoint(startingPoint);
 
         if(flights.isEmpty()){
-            throw new IllegalArgumentException("Рейс с данной отправной точкой не найден");
+            throw new IllegalArgumentException("Рейсы с данной отправной точкой не найдены");
         }
 
         int count = flights.stream()

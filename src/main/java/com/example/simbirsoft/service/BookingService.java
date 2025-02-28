@@ -5,6 +5,7 @@ import com.example.simbirsoft.entity.Flight;
 import com.example.simbirsoft.entity.FlightStatus;
 import com.example.simbirsoft.entity.Ticket;
 import com.example.simbirsoft.entity.TicketStatus;
+import com.example.simbirsoft.exception.UnavailableException;
 import com.example.simbirsoft.repository.FlightRepository;
 import com.example.simbirsoft.repository.TicketRepository;
 import com.example.simbirsoft.security.entity.User;
@@ -40,7 +41,7 @@ public class BookingService {
     private int bookingExpirationMinutes;
 
     @Transactional
-    public TicketDto bookTicket(Long ticketId) {
+    public TicketDto bookTicket(Long ticketId) throws UnavailableException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
             throw new SecurityException("Пользователь не аутентифицирован");
@@ -49,12 +50,18 @@ public class BookingService {
         String username = authentication.getName();
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("Покупатель не найден"));
+
         List<Ticket> t = ticketRepository.findAll();
         Ticket ticket = ticketRepository.findById(ticketId)
                 .orElseThrow(() -> new IllegalArgumentException("Билет с ID: " + ticketId + " не найден"));
         Flight flight = ticket.getFlight();
+
         if (flight.getStatus() == FlightStatus.COMPLETED) {
-            throw new IllegalArgumentException("Нельзя купить билет на завершенный рейс");
+            throw new UnavailableException("Нельзя купить билет на завершенный рейс");
+        }
+
+        if (ticket.getStatus() == TicketStatus.BOOKED || ticket.getStatus() == TicketStatus.SOLD) {
+            throw new UnavailableException("Нельзя забронировать билет, так как его статус: " + ticket.getStatus());
         }
 
         ticket.setStatus(TicketStatus.BOOKED);
@@ -70,7 +77,6 @@ public class BookingService {
 
 
     @Scheduled(fixedRate = 60000)
-    @Transactional
     public void releaseExpiredBookings() {
         ticketRepository.releaseExpiredBookings(LocalDateTime.now());
         log.info("Бронь снята, так как время для подтвержения брони окончено");

@@ -9,6 +9,7 @@ import com.example.simbirsoft.repository.FlightRepository;
 import com.example.simbirsoft.repository.TicketRepository;
 import com.example.simbirsoft.security.entity.User;
 import com.example.simbirsoft.security.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -61,20 +62,14 @@ public class CashierService {
 
     //отмена рейса по особым обстоятельствам
     @Transactional
-    public String cancelFlight(Long id) {
-        Optional<Flight> flightOptional = flightRepository.findById(id);
-        if (flightOptional.isPresent()) {
-            Flight flight = flightOptional.get();
-
-            if (flight.getStatus() == FlightStatus.SCHEDULED) {
-                flight.setStatus(FlightStatus.CANCELED);
-                flightRepository.save(flight);
-                return "Рейс успешно отменен";
-            } else {
-                return "Невозможно отменить рейс(стфтус не подходит";
-            }
+    public void cancelFlight(Long id) {
+        Flight flight = flightRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Рейс не найден"));
+        if (flight.getStatus() != FlightStatus.SCHEDULED) {
+            throw new IllegalArgumentException("Невозможно отменитьь рейс(статус рейса не подходит)");
         }
-        return "Рейс не найден";
+        flight.setStatus(FlightStatus.CANCELED);
+        flightRepository.save(flight);
     }
 
     public TicketDto mapTicketToDto(Ticket ticket) {

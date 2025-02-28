@@ -1,7 +1,6 @@
 package com.example.simbirsoft.security.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -24,7 +23,7 @@ public class BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
-    private Status status;
+    private UserStatus status;
 
     public Long getId() {
         return id;
@@ -50,11 +49,11 @@ public class BaseEntity {
         this.updated = updated;
     }
 
-    public Status getStatus() {
+    public UserStatus getStatus() {
         return status;
     }
 
-    public void setStatus(Status status) {
+    public void setStatus(UserStatus status) {
         this.status = status;
     }
 }

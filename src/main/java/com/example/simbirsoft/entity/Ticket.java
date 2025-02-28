@@ -37,8 +37,6 @@ public class Ticket {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    private String message;
-
     public Long getId() {
         return id;
     }
@@ -102,13 +100,5 @@ public class Ticket {
 
     public void setBookingExpirationTime(LocalDateTime bookingExpirationTime) {
         this.bookingExpirationTime = bookingExpirationTime;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
     }
 }

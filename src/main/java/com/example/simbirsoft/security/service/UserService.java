@@ -1,7 +1,7 @@
 package com.example.simbirsoft.security.service;
 
 import com.example.simbirsoft.security.entity.Role;
-import com.example.simbirsoft.security.entity.Status;
+import com.example.simbirsoft.security.entity.UserStatus;
 import com.example.simbirsoft.security.entity.User;
 import com.example.simbirsoft.security.repository.RoleRepository;
 import com.example.simbirsoft.security.repository.UserRepository;
@@ -14,7 +14,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Service
-public class UserService{
+public class UserService {
 
     private final static Logger logger = LoggerFactory.getLogger(UserService.class);
     private final UserRepository userRepository;
@@ -22,14 +22,14 @@ public class UserService{
     private final BCryptPasswordEncoder passwordEncoder;
 
     public UserService(UserRepository userRepository,
-                           RoleRepository roleRepository,
-                           BCryptPasswordEncoder passwordEncoder) {
+                       RoleRepository roleRepository,
+                       BCryptPasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
     }
-    
-    public User register(User user, String roleName){
+
+    public User register(User user, String roleName) {
         Role role = roleRepository.findByName(roleName);
         if (role == null) {
             throw new IllegalArgumentException("Роль " + roleName + " не найдена");
@@ -39,11 +39,10 @@ public class UserService{
         userRoles.add(role);
 
         String encodedPassword = passwordEncoder.encode(user.getPassword());
-        logger.info("Пароль перед сохранением (хешированный): {}", encodedPassword);
 
         user.setPassword(encodedPassword);
         user.setRoles(userRoles);
-        user.setStatus(Status.ACTIVE);
+        user.setStatus(UserStatus.ACTIVE);
 
         User registeredUser = userRepository.save(user);
 
@@ -51,11 +50,11 @@ public class UserService{
 
         return registeredUser;
     }
-    
-    public User findByUsername(String username){
+
+    public User findByUsername(String username) {
         User result = userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("Пользователь не найден"));
-        logger.info("В методе findUsername - пользователь: {} найден по имени пользователя: {}",result,username);
+        logger.info("В методе findUsername - пользователь: {} найден по имени пользователя: {}", result, username);
         return result;
     }
 

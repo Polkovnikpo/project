@@ -1,11 +1,20 @@
 package com.example.simbirsoft.dto;
 
-public class AirplaneDto {
-    private String name;
-    private String model;
-    private Integer places;
-    private long airlineId;
+import io.swagger.v3.oas.annotations.media.Schema;
 
+@Schema(description = "Информация о самолете")
+public class AirplaneDto {
+    @Schema(description = "Название самолета", example = "Boeing 300")
+    private String name;
+
+    @Schema(description = "Модель самолета", example = "300-1")
+    private String model;
+
+    @Schema(description = "Количество мест", example = "200")
+    private Integer places;
+
+    @Schema(description = "Идентификатор авиакомпании, к которой принадлежит самолет", example = "123")
+    private long airlineId;
 
     public String getName() {
         return name;

@@ -1,12 +1,7 @@
 package com.example.simbirsoft.security.entity;
 
-import com.example.simbirsoft.security.entity.BaseEntity;
-import com.example.simbirsoft.security.entity.Role;
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 
-import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -23,7 +18,7 @@ public class User extends BaseEntity {
     private String password;
 
     @Column(name = "status")
-    private Status status;
+    private UserStatus status;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_roles",
@@ -63,11 +58,11 @@ public class User extends BaseEntity {
         this.roles = roles;
     }
 
-    public Status getStatus() {
+    public UserStatus getStatus() {
         return status;
     }
 
-    public void setStatus(Status status) {
+    public void setStatus(UserStatus status) {
         this.status = status;
     }
 }
