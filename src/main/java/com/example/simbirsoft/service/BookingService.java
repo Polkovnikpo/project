@@ -70,13 +70,12 @@ public class BookingService {
         ticketRepository.save(ticket);
 
         TicketDto ticketDto = mapTicketToDto(ticket);
-        ticketDto.setMessage("Билет успешно забронирован");
 
         return ticketDto;
     }
 
-
     @Scheduled(fixedRate = 60000)
+    @Transactional
     public void releaseExpiredBookings() {
         ticketRepository.releaseExpiredBookings(LocalDateTime.now());
         log.info("Бронь снята, так как время для подтвержения брони окончено");

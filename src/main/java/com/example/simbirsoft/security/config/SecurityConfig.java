@@ -37,7 +37,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(LOGIN_ENDPOINT).permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**")
-                        .hasAnyAuthority("ROLE_MANAGER", "ROLE_CASHIER")
+                        .permitAll()
                         .requestMatchers(MANAGER_ENDPOINT).hasAuthority("ROLE_MANAGER")
                         .requestMatchers(CASHIER_ENDPOINT).hasAuthority("ROLE_CASHIER")
                         .requestMatchers(BUYER_ENDPOINT).hasAuthority("ROLE_BUYER")
