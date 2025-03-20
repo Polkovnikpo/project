@@ -8,6 +8,8 @@ import com.example.simbirsoft.entity.Airline;
 import com.example.simbirsoft.entity.Airplane;
 import com.example.simbirsoft.entity.Flight;
 import com.example.simbirsoft.entity.Ticket;
+import com.example.simbirsoft.exception.ErrorCode;
+import com.example.simbirsoft.exception.ServiceException;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,11 +32,9 @@ public class AirlineService {
 
     public Integer getTicketsCountByAirlineId(Long airlineId) {
         log.info("Получение количества билетов для авиакомпании с ID: {}", airlineId);
+
         Airline airline = airlineRepository.findById(airlineId)
-                .orElseThrow(() -> {
-                    log.error("Авиакомпания с ID: {} не найдена", airlineId);
-                    return new IllegalArgumentException("Авиакомпания не найдена");
-                });
+                .orElseThrow(() -> new ServiceException(ErrorCode.NOT_FOUND, "Авиакомпания не найдена"));
 
         int ticketCount = airline.getAirplanes().stream()
                 .flatMap(airplane -> airplane.getFlights().stream())
@@ -56,43 +56,34 @@ public class AirlineService {
 
     public AirlineDto updateAirline(Long id, AirlineDto dto) {
         log.info("Обновление авиакомпании с ID: {}, новые данные: {}", id, dto);
-        Optional<Airline> airlineOptional = airlineRepository.findById(id);
-        if (airlineOptional.isPresent()) {
-            Airline airline = airlineOptional.get();
-            airline.setName(dto.getName());
 
-            airlineRepository.save(airline);
+        Airline airline = airlineRepository.findById(id)
+                .orElseThrow(() -> new ServiceException(ErrorCode.NOT_FOUND, "Авиакомпания не найдена"));
 
-            AirlineDto airlineDto = mapAirlineToDto(airline);
-            log.info("Авиакомпания с ID {} успешно обновлена", id);
-            return airlineDto;
-        } else {
-            log.warn("Авиакомпания с ID {} не найдена для обновления", id);
-            return null;
-        }
+        airline.setName(dto.getName());
+        airlineRepository.save(airline);
+
+        AirlineDto airlineDto = mapAirlineToDto(airline);
+        log.info("Авиакомпания с ID {} успешно обновлена", id);
+        return airlineDto;
     }
 
     public AirlineDto getAirlineById(Long id) {
         log.info("Получение авиакомпании с ID: {}", id);
-        Optional<Airline> airlineOptional = airlineRepository.findById(id);
+        Airline airline = airlineRepository.findById(id)
+                .orElseThrow(() -> new ServiceException(ErrorCode.NOT_FOUND, "Авиакомпания не найдена"));
 
-        if (airlineOptional.isPresent()) {
-            AirlineDto airlineDto = mapAirlineToDto(airlineOptional.get());
-            log.info("Авиакомпания с ID {} успешно получена: {}", id, airlineDto);
-            return airlineDto;
-        } else {
-            log.info("Авиакомпания с ID {} не найдена", id);
-            return null;
-        }
+        AirlineDto airlineDto = mapAirlineToDto(airline);
+        log.info("Авиакомпания с ID {} успешно получена: {}", id, airlineDto);
+        return airlineDto;
     }
 
     public void deleteAirlineById(Long id) {
-        try {
-            airlineRepository.deleteById(id);
-            log.info("Авиакомпания с ID {} успешно удалена", id);
-        } catch (Exception e) {
-            log.error("Ошибка при удалении авиакомпании с ID {}: {}", id, e.getMessage(), e);
+        if (!airlineRepository.existsById(id)) {
+            throw new ServiceException(ErrorCode.NOT_FOUND, "Авиакомпания не найдена");
         }
+        airlineRepository.deleteById(id);
+        log.info("Авиакомпания с ID {} успешно удалена", id);
     }
 
 

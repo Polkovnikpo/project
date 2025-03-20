@@ -2,26 +2,20 @@ package com.example.simbirsoft.service;
 
 import com.example.simbirsoft.dto.TicketDto;
 import com.example.simbirsoft.entity.Flight;
-import com.example.simbirsoft.entity.FlightStatus;
 import com.example.simbirsoft.entity.Ticket;
 import com.example.simbirsoft.entity.TicketStatus;
-import com.example.simbirsoft.repository.AirplaneRepository;
+import com.example.simbirsoft.exception.ErrorCode;
+import com.example.simbirsoft.exception.ServiceException;
 import com.example.simbirsoft.repository.FlightRepository;
 import com.example.simbirsoft.repository.TicketRepository;
-import com.example.simbirsoft.security.service.UserService;
-import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,42 +24,46 @@ public class TicketService {
     private final static Logger log = LoggerFactory.getLogger(TicketService.class);
     private final TicketRepository ticketRepository;
     private final FlightRepository flightRepository;
-    private final AirplaneRepository airplaneRepository;
-    private final UserService userService;
 
     @Value("${ticket.commission}")
     private BigDecimal commission;
 
-    public TicketService(TicketRepository ticketRepository,
-                         FlightRepository flightRepository,
-                         AirplaneRepository airplaneRepository,
-                         UserService userService) {
+    public TicketService(TicketRepository ticketRepository, FlightRepository flightRepository) {
         this.ticketRepository = ticketRepository;
         this.flightRepository = flightRepository;
-        this.airplaneRepository = airplaneRepository;
-        this.userService = userService;
     }
 
     public TicketDto createTicket(TicketDto ticketDto) {
-        Ticket ticket = mapDtoToTicket(ticketDto);
-        Flight flight = flightRepository.findById(ticketDto.getFlightId()).orElseThrow();
-        ticket.setFlight(flight);
-        ticketRepository.save(ticket);
-        TicketDto dto = mapTicketToDto(ticket);
-        log.info("Билет успешно создан");
-        return dto;
+        try {
+            Ticket ticket = mapDtoToTicket(ticketDto);
+            Flight flight = flightRepository.findById(ticketDto.getFlightId())
+                    .orElseThrow(() -> new ServiceException(ErrorCode.NOT_FOUND, "Рейс не найден"));
+            ticket.setFlight(flight);
+            ticketRepository.save(ticket);
+            TicketDto dto = mapTicketToDto(ticket);
+            log.info("Билет успешно создан: {}", dto);
+            return dto;
+        } catch (Exception e) {
+            log.error("Ошибка при создании билета: {}", e.getMessage(), e);
+            throw new ServiceException(ErrorCode.DATABASE_ERROR, "Ошибка при создании билета");
+        }
     }
 
     public TicketDto createTicketWithCommission(TicketDto dto) {
-        log.info("Создание билета с комиссией: {}, ставка комиссии: {}", dto, commission);
-        Ticket ticket = mapDtoToTicket(dto);
-        int commissionPrice = calculateCommission(ticket.getPrice(), commission);
-        ticket.setPrice(BigDecimal.valueOf(commissionPrice));
-        ticket.setIsCommission(true);
-        ticketRepository.save(ticket);
-        TicketDto result = mapTicketToDto(ticket);
-        log.info("Билет с комиссией успешно создан: {}", result);
-        return result;
+        try {
+            log.info("Создание билета с комиссией: {}, ставка комиссии: {}", dto, commission);
+            Ticket ticket = mapDtoToTicket(dto);
+            int commissionPrice = calculateCommission(ticket.getPrice(), commission);
+            ticket.setPrice(BigDecimal.valueOf(commissionPrice));
+            ticket.setIsCommission(true);
+            ticketRepository.save(ticket);
+            TicketDto result = mapTicketToDto(ticket);
+            log.info("Билет с комиссией успешно создан: {}", result);
+            return result;
+        } catch (Exception e) {
+            log.error("Ошибка при создании билета с комиссией: {}", e.getMessage(), e);
+            throw new ServiceException(ErrorCode.DATABASE_ERROR, "Ошибка при создании билета с комиссией");
+        }
     }
 
     private int calculateCommission(BigDecimal basePrice, BigDecimal commissionRate) {
@@ -74,87 +72,97 @@ public class TicketService {
     }
 
     public TicketDto updateTicketById(Long id, TicketDto dto) {
-        Optional<Ticket> optionalTicket = ticketRepository.findById(id);
-        if (optionalTicket.isPresent()) {
-            Ticket ticket = new Ticket();
+        try {
+            Ticket ticket = ticketRepository.findById(id)
+                    .orElseThrow(() -> new ServiceException(ErrorCode.NOT_FOUND, "Билет не найден"));
+
             ticket.setPrice(dto.getPrice());
             ticket.setStatus(dto.getStatus());
             ticketRepository.save(ticket);
             log.info("Билет с ID {} успешно обновлен", id);
-            TicketDto ticketDto = mapTicketToDto(ticket);
-            return ticketDto;
-        } else {
-            log.warn("Билет с ID {} не найден для обновления", id);
-            return null;
+            return mapTicketToDto(ticket);
+        } catch (Exception e) {
+            log.error("Ошибка при обновлении билета с ID {}: {}", id, e.getMessage(), e);
+            throw new ServiceException(ErrorCode.DATABASE_ERROR, "Ошибка при обновлении билета");
         }
     }
 
     public TicketDto getTicketById(Long id) {
-        Optional<Ticket> ticketOptional = ticketRepository.findById(id);
-        if (ticketOptional.isPresent()) {
-            TicketDto ticketDto = mapTicketToDto(ticketOptional.get());
+        try {
+            Ticket ticket = ticketRepository.findById(id)
+                    .orElseThrow(() -> new ServiceException(ErrorCode.NOT_FOUND, "Билет не найден"));
+            TicketDto ticketDto = mapTicketToDto(ticket);
             log.info("Билет с ID {} успешно получен: {}", id, ticketDto);
             return ticketDto;
-        } else {
-            log.warn("Билет с ID {} не найден для получения", id);
-            return null;
+        } catch (Exception e) {
+            log.error("Ошибка при получении билета с ID {}: {}", id, e.getMessage(), e);
+            throw new ServiceException(ErrorCode.DATABASE_ERROR, "Ошибка при получении билета");
         }
     }
 
     public void deleteTicketById(Long id) {
         try {
+            if (!ticketRepository.existsById(id)) {
+                throw new ServiceException(ErrorCode.NOT_FOUND, "Билет не найден");
+            }
             ticketRepository.deleteById(id);
             log.info("Билет с ID {} успешно удален", id);
         } catch (Exception e) {
             log.error("Ошибка при удалении билета с ID {}: {}", id, e.getMessage(), e);
+            throw new ServiceException(ErrorCode.DATABASE_ERROR, "Ошибка при удалении билета");
         }
     }
 
     public Integer getTicketCountByStartingPoint(String startingPoint) {
-        List<Flight> flights = flightRepository.findByStartingPoint(startingPoint);
+        try {
+            List<Flight> flights = flightRepository.findByStartingPoint(startingPoint);
 
-        if(flights.isEmpty()){
-            throw new IllegalArgumentException("Рейсы с данной отправной точкой не найдены");
-        }
-
-        int count = flights.stream()
-                .flatMap(flight -> flight.getTickets().stream())
-                .toList()
-                .size();
-
-        log.info("Количество билетов для точки отправления {}: {}", startingPoint, count);
-        return count;
-    }
-
-    public BigDecimal getAverageCommissionInRubles() {
-        List<Ticket> ticketsCommission = ticketRepository.findAllByIsCommission(true);
-
-        if (ticketsCommission.isEmpty()) {
-            log.info("Билеты с комиссией не найдены");
-            return BigDecimal.ZERO;
-        }
-
-        BigDecimal sum = BigDecimal.ZERO;
-        for (Ticket ticket : ticketsCommission) {
-            BigDecimal ticketPrice = ticket.getPrice();
-
-            if (ticketPrice != null) {
-                BigDecimal result = ticketPrice.multiply(BigDecimal.valueOf(0.025));
-                sum = sum.add(result);
+            if (flights.isEmpty()) {
+                throw new ServiceException(ErrorCode.NOT_FOUND, "Рейсы с данной отправной точкой не найдены");
             }
-        }
 
-        BigDecimal average = sum.divide(BigDecimal.valueOf(ticketsCommission.size()), 2, RoundingMode.HALF_UP);
-        log.info("Средняя комиссия: {}", average);
-        return average;
+            int count = flights.stream()
+                    .flatMap(flight -> flight.getTickets().stream())
+                    .toList()
+                    .size();
+
+            log.info("Количество билетов для точки отправления {}: {}", startingPoint, count);
+            return count;
+        } catch (ServiceException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Ошибка при получении количества билетов по отправной точке {}: {}", startingPoint, e.getMessage(), e);
+            throw new ServiceException(ErrorCode.DATABASE_ERROR, "Ошибка при получении количества билетов по отправной точке");
+        }
     }
 
     public List<TicketDto> getAllTickets(boolean showSold) {
-        List<Ticket> allTickets = ticketRepository.findAll();
-         return allTickets.stream()
+        try {
+            List<Ticket> allTickets = ticketRepository.findAll();
+            List<TicketDto> result = allTickets.stream()
                     .filter(ticket -> showSold || ticket.getStatus() != TicketStatus.SOLD)
                     .map(this::mapTicketToDto)
                     .collect(Collectors.toList());
+            log.info("Получено {} билетов (showSold={})", result.size(), showSold);
+            return result;
+        } catch (Exception e) {
+            log.error("Ошибка при получении билетов: {}", e.getMessage(), e);
+            throw new ServiceException(ErrorCode.DATABASE_ERROR, "Ошибка при получении билетов");
+        }
+    }
+
+    public List<TicketDto> getTicketsByPrice(BigDecimal price) {
+        try {
+            List<TicketDto> tickets = ticketRepository.findAll().stream()
+                    .filter(ticket -> ticket.getPrice().compareTo(price) > 0)
+                    .map(this::mapTicketToDto)
+                    .collect(Collectors.toList());
+            log.info("Найдено {} билетов с ценой выше: {}", tickets.size(), price);
+            return tickets;
+        } catch (Exception e) {
+            log.error("Ошибка при получении билетов по цене: {}", e.getMessage(), e);
+            throw new ServiceException(ErrorCode.DATABASE_ERROR, "Ошибка при получении по цене");
+        }
     }
 
     public Ticket mapDtoToTicket(TicketDto ticketDto) {

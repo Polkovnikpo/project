@@ -1,6 +1,8 @@
 package com.example.simbirsoft.service;
 
 import com.example.simbirsoft.entity.Airline;
+import com.example.simbirsoft.exception.ErrorCode;
+import com.example.simbirsoft.exception.ServiceException;
 import com.example.simbirsoft.repository.AirlineRepository;
 import com.example.simbirsoft.repository.AirplaneRepository;
 import com.example.simbirsoft.dto.AirplaneDto;
@@ -15,7 +17,7 @@ import java.util.Optional;
 @Service
 public class AirplaneService {
 
-    private final static Logger log = LoggerFactory.getLogger(AirlineService.class);
+    private final static Logger log = LoggerFactory.getLogger(AirplaneService.class);
     private final AirplaneRepository airplaneRepository;
     private final AirlineRepository airlineRepository;
 
@@ -26,55 +28,51 @@ public class AirplaneService {
 
     public AirplaneDto createAirplane(AirplaneDto dto) {
         log.info("Создание нового самолета с данными: {}", dto);
+
+        Airline airline = airlineRepository.findById(dto.getAirlineId())
+                .orElseThrow(() -> new ServiceException(ErrorCode.NOT_FOUND, "Авиакомпания не найдена"));
+
         Airplane airplane = mapDtoToAirplane(dto);
-        Airline airline = airlineRepository.findById(dto.getAirlineId()).orElseThrow();
         airplane.setAirline(airline);
         airplaneRepository.save(airplane);
+
         AirplaneDto airplaneDto = mapAirplaneToDto(airplane);
-        log.info("Самолет успешно создан");
+        log.info("Самолет успешно создан: {}", airplaneDto);
         return airplaneDto;
     }
 
 
     public AirplaneDto updateAirplane(Long id, AirplaneDto dto) {
         log.info("Обновление самолета с ID: {}, новые данные: {}", id, dto);
-        Optional<Airplane> airplaneOptional = airplaneRepository.findById(id);
-        if (airplaneOptional.isPresent()) {
-            Airplane airplane = airplaneOptional.get();
-            airplane.setName(dto.getName());
-            airplane.setModel(dto.getModel());
-            airplane.setPlaces(dto.getPlaces());
-            airplaneRepository.save(airplane);
-            AirplaneDto airplaneDto = mapAirplaneToDto(airplane);
-            log.info("Самолет с ID {} успешно обновлен", id);
-            return airplaneDto;
-        } else {
-            log.warn("Самолет с ID {} не найден для обновления", id);
-            return null;
-        }
+        Airplane airplane = airplaneRepository.findById(id)
+                .orElseThrow(() -> new ServiceException(ErrorCode.NOT_FOUND, "Самолет не найден"));
+
+        airplane.setName(dto.getName());
+        airplane.setModel(dto.getModel());
+        airplane.setPlaces(dto.getPlaces());
+        airplaneRepository.save(airplane);
+
+        AirplaneDto airplaneDto = mapAirplaneToDto(airplane);
+        log.info("Самолет с ID {} успешно обновлен", id);
+        return airplaneDto;
     }
 
     public AirplaneDto getAirplaneById(Long id) {
         log.info("Получение самолета с ID: {}", id);
-        Optional<Airplane> airplane = airplaneRepository.findById(id);
-        if (airplane.isPresent()) {
-            AirplaneDto airplaneDto = mapAirplaneToDto(airplane.get());
-            log.info("Самолет с ID {} успешно получен: {}", id, airplaneDto);
-            return airplaneDto;
-        } else {
-            log.warn("Самолет с ID {} не найден", id);
-            return null;
-        }
+        Airplane airplane = airplaneRepository.findById(id)
+                .orElseThrow(() -> new ServiceException(ErrorCode.NOT_FOUND, "Самолет не найден"));
+
+        AirplaneDto airplaneDto = mapAirplaneToDto(airplane);
+        log.info("Самолет с ID {} успешно получен: {}", id, airplaneDto);
+        return airplaneDto;
     }
 
     public void deleteAirplaneById(Long id) {
-        log.info("Удаление самолета с ID: {}", id);
-        try {
-            airplaneRepository.deleteById(id);
-            log.info("Самолет с ID {} успешно удален", id);
-        } catch (Exception e) {
-            log.error("Ошибка при удаление самолета с ID {}: {}", id, e.getMessage(), e);
+        if (!airlineRepository.existsById(id)) {
+            throw new ServiceException(ErrorCode.NOT_FOUND, "Самолет не найден");
         }
+        airplaneRepository.deleteById(id);
+        log.info("Самолет с ID {} успешно удален", id);
     }
 
     public Airplane mapDtoToAirplane(AirplaneDto dto) {

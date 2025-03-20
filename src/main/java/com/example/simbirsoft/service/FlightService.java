@@ -4,6 +4,8 @@ import com.example.simbirsoft.dto.FlightDto;
 import com.example.simbirsoft.entity.Airplane;
 import com.example.simbirsoft.entity.Flight;
 import com.example.simbirsoft.entity.FlightStatus;
+import com.example.simbirsoft.exception.ErrorCode;
+import com.example.simbirsoft.exception.ServiceException;
 import com.example.simbirsoft.repository.AirplaneRepository;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -41,42 +43,36 @@ public class FlightService {
     }
 
     public FlightDto updateFlight(Long id, FlightDto dto) {
-        Optional<Flight> flightOptional = flightRepository.findById(id);
-        if (flightOptional.isPresent()) {
-            Flight flight = flightOptional.get();
-            flight.setDepartureTime(dto.getDepartureTime());
-            flight.setArrivalTime(dto.getArrivalTime());
-            flight.setStartingPoint(dto.getStartingPoint());
-            flight.setDestinationPoint(dto.getDestinationPoint());
-            flightRepository.save(flight);
-            FlightDto flightDto = mapFlightToDto(flight);
-            log.info("Рейс с ID {} успешно обновлен", id);
-            return flightDto;
-        } else {
-            log.info("Рейс с ID {} не найден для обновления", id);
-            return null;
-        }
+        log.info("Обновления полета с ID: {}, новые данные: {}", id, dto);
+        Flight flight = flightRepository.findById(id)
+                .orElseThrow(() -> new ServiceException(ErrorCode.NOT_FOUND, "Полет не найден"));
+
+        flight.setDepartureTime(dto.getDepartureTime());
+        flight.setArrivalTime(dto.getArrivalTime());
+        flight.setStartingPoint(dto.getStartingPoint());
+        flight.setDestinationPoint(dto.getDestinationPoint());
+        flightRepository.save(flight);
+
+        FlightDto flightDto = mapFlightToDto(flight);
+        log.info("Рейс с ID {} успешно обновлен", id);
+        return flightDto;
     }
 
     public FlightDto getFlightById(Long id) {
-        Optional<Flight> flightOptional = flightRepository.findById(id);
-        if (flightOptional.isPresent()) {
-            FlightDto flightDto = mapFlightToDto(flightOptional.get());
-            log.info("Рейс с ID {} получен: {}", id, flightDto);
-            return flightDto;
-        } else {
-            log.info("Рейс с ID {} не найден", id);
-            return null;
-        }
+        Flight flight = flightRepository.findById(id)
+                .orElseThrow(() -> new ServiceException(ErrorCode.NOT_FOUND, "Полет не найден"));
+
+        FlightDto flightDto = mapFlightToDto(flight);
+        log.info("Рейс с ID {} получен: {}", id, flightDto);
+        return flightDto;
     }
 
     public void deleteFlightDto(Long id) {
-        try {
-            flightRepository.deleteById(id);
-            log.info("Рейс с ID {} успешно удален", id);
-        } catch (Exception e) {
-            log.error("Ошибка при удаление рейса с ID {}: {}", id, e.getMessage(), e);
+        if (!flightRepository.existsById(id)) {
+            throw new ServiceException(ErrorCode.NOT_FOUND, "Полет не найден");
         }
+        flightRepository.deleteById(id);
+        log.info("Рейс с ID {} успешно удален", id);
     }
 
     @Scheduled(fixedRate = 60000)
@@ -84,9 +80,13 @@ public class FlightService {
     public void updateFlightStatus() {
         LocalDateTime now = LocalDateTime.now();
 
+        log.info("Начало обновления статуса рейсов на {}", now);
+
         flightRepository.updateStatusInProcess(now);
 
         flightRepository.updateStatusInCompleted(now);
+
+        log.info("Обновление статусов рейсов завершено");
     }
 
     public Flight mapDtoToFlight(FlightDto flightDto) {

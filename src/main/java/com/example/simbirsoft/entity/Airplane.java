@@ -6,7 +6,6 @@ import lombok.Data;
 
 import java.util.List;
 
-@Data
 @Entity
 @Table(name = "airplane")
 public class Airplane {

@@ -1,7 +1,6 @@
 package com.example.simbirsoft.controller;
 
 import com.example.simbirsoft.dto.TicketDto;
-import com.example.simbirsoft.exception.UnavailableException;
 import com.example.simbirsoft.service.BookingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -26,8 +25,8 @@ public class BookingController {
     @ApiResponse(responseCode = "200", description = "Билет успешно забронирован")
     @ApiResponse(responseCode = "404", description = "Билет не найден")
     @ApiResponse(responseCode = "409", description = "Билет уже забронирован или куплен")
-    public ResponseEntity<TicketDto> bookTicket(@PathVariable Long ticketId) throws UnavailableException {
-        TicketDto bookedTicket = bookingService.bookTicket(ticketId);
+public ResponseEntity<TicketDto> bookTicket(@PathVariable Long ticketId, @RequestBody(required = false) String promoCode){
+        TicketDto bookedTicket = bookingService.bookTicket(ticketId, promoCode);
         return ResponseEntity.ok(bookedTicket);
     }
 }

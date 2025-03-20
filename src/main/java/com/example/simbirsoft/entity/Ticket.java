@@ -8,7 +8,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Data
 @Table(name = "ticket")
 public class Ticket {
 
@@ -23,6 +22,9 @@ public class Ticket {
     @Column
     private BigDecimal price;
 
+    @Column(nullable = true)
+    private BigDecimal discountPrice;
+
     @Enumerated(EnumType.STRING)
     @Column
     private TicketStatus status;
@@ -34,7 +36,7 @@ public class Ticket {
     private boolean isCommission;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = true)
     private User user;
 
     public Long getId() {
@@ -100,5 +102,13 @@ public class Ticket {
 
     public void setBookingExpirationTime(LocalDateTime bookingExpirationTime) {
         this.bookingExpirationTime = bookingExpirationTime;
+    }
+
+    public BigDecimal getDiscountPrice() {
+        return discountPrice;
+    }
+
+    public void setDiscountPrice(BigDecimal discountPrice) {
+        this.discountPrice = discountPrice;
     }
 }

@@ -71,15 +71,6 @@ public class TicketController {
         return ResponseEntity.ok(ticketCount);
     }
 
-    @GetMapping(value = "/averageCommissionInRubles")
-    @Operation(summary = "Средняя комиссия в рублях", description = "Возвращает среднюю комиссию по всем билетам")
-    @ApiResponse(responseCode = "200", description = "Средняя комиссия успешно получена")
-    @ApiResponse(responseCode = "500", description = "Ошибка сервера")
-    public ResponseEntity<BigDecimal> getAverageCommissionInRubles() {
-        BigDecimal commission = ticketService.getAverageCommissionInRubles();
-        return ResponseEntity.ok(commission);
-    }
-
     @GetMapping("/showSold")
     @Operation(summary = "Получить список билетов", description = "Возвращает список билетов с фильтрацией по проданным билетам")
     @ApiResponse(responseCode = "200", description = "Список билетов успешно получен")
@@ -87,6 +78,16 @@ public class TicketController {
     public ResponseEntity<List<TicketDto>> getTickets(@RequestParam(value = "showSold", defaultValue = "false") boolean showSold) {
         List<TicketDto> filteredTickets = ticketService.getAllTickets(showSold);
         return ResponseEntity.ok(filteredTickets);
+    }
+
+    @GetMapping("/by-price")
+    @Operation(summary = "Получить билеты дороже указанной цены",
+            description = "Возвращает список билетов<  укоторых цена выше переданной")
+    @ApiResponse(responseCode = "200", description = "Список билетов успешно получен")
+    @ApiResponse(responseCode = "400", description = "Некорректный запрос")
+    public ResponseEntity<List<TicketDto>> getTicketsByPrice(@RequestParam BigDecimal price) {
+        List<TicketDto> tickets = ticketService.getTicketsByPrice(price);
+        return ResponseEntity.ok(tickets);
     }
 
     @DeleteMapping(value = "/{id}")

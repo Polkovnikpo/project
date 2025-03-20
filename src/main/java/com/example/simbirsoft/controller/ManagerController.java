@@ -11,12 +11,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/manager")
-@Tag(name = "Менеджер", description = "Методы для получения статистики билетов")
+@Tag(name = "Менеджер", description = "Методы для получения статистики")
 public class ManagerController {
     private final ManagerService managerService;
 
@@ -36,5 +37,14 @@ public class ManagerController {
         stats.put("totalRevenue", managerService.getTotalRevenue());
 
         return ResponseEntity.ok(stats);
+    }
+
+    @GetMapping(value = "/averageCommissionInRubles")
+    @Operation(summary = "Средняя комиссия в рублях", description = "Возвращает среднюю комиссию по всем билетам")
+    @ApiResponse(responseCode = "200", description = "Средняя комиссия успешно получена")
+    @ApiResponse(responseCode = "500", description = "Ошибка сервера")
+    public ResponseEntity<BigDecimal> getAverageCommissionInRubles() {
+        BigDecimal commission = managerService.getAverageCommissionInRubles();
+        return ResponseEntity.ok(commission);
     }
 }
